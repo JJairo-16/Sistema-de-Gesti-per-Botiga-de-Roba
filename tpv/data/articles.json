@@ -1,0 +1,602 @@
+[
+  {
+    "id": 1,
+    "nom": "Camisa Test 1",
+    "familia": "camisa",
+    "talla_coll": 46,
+    "amplada_pit": 14,
+    "preu_base": 26.57,
+    "iva": 10,
+    "stock": 2
+  },
+  {
+    "id": 2,
+    "nom": "Camisa Test 2",
+    "familia": "camisa",
+    "talla_coll": 43,
+    "amplada_pit": 10,
+    "preu_base": 21.85,
+    "iva": 21,
+    "stock": 4
+  },
+  {
+    "id": 3,
+    "nom": "Camisa Test 3",
+    "familia": "camisa",
+    "talla_coll": 37,
+    "amplada_pit": 15,
+    "preu_base": 38.84,
+    "iva": 4,
+    "stock": 3
+  },
+  {
+    "id": 4,
+    "nom": "Camisa Test 4",
+    "familia": "camisa",
+    "talla_coll": 52,
+    "amplada_pit": 10,
+    "preu_base": 31.95,
+    "iva": 10,
+    "stock": 2
+  },
+  {
+    "id": 5,
+    "nom": "Camisa Test 5",
+    "familia": "camisa",
+    "talla_coll": 49,
+    "amplada_pit": 12,
+    "preu_base": 28.69,
+    "iva": 21,
+    "stock": 1
+  },
+  {
+    "id": 6,
+    "nom": "Camisa Test 6",
+    "familia": "camisa",
+    "talla_coll": 43,
+    "amplada_pit": 14,
+    "preu_base": 20.84,
+    "iva": 4,
+    "stock": 2
+  },
+  {
+    "id": 7,
+    "nom": "Camisa Test 7",
+    "familia": "camisa",
+    "talla_coll": 48,
+    "amplada_pit": 11,
+    "preu_base": 32.08,
+    "iva": 10,
+    "stock": 2
+  },
+  {
+    "id": 8,
+    "nom": "Camisa Test 8",
+    "familia": "camisa",
+    "talla_coll": 52,
+    "amplada_pit": 13,
+    "preu_base": 25.56,
+    "iva": 21,
+    "stock": 1
+  },
+  {
+    "id": 9,
+    "nom": "Camisa Test 9",
+    "familia": "camisa",
+    "talla_coll": 39,
+    "amplada_pit": 13,
+    "preu_base": 24.99,
+    "iva": 4,
+    "stock": 1
+  },
+  {
+    "id": 10,
+    "nom": "Camisa Test 10",
+    "familia": "camisa",
+    "talla_coll": 39,
+    "amplada_pit": 13,
+    "preu_base": 22.84,
+    "iva": 10,
+    "stock": 4
+  },
+  {
+    "id": 11,
+    "nom": "Camisa Test 11",
+    "familia": "camisa",
+    "talla_coll": 50,
+    "amplada_pit": 11,
+    "preu_base": 39.26,
+    "iva": 21,
+    "stock": 4
+  },
+  {
+    "id": 12,
+    "nom": "Camisa Test 12",
+    "familia": "camisa",
+    "talla_coll": 50,
+    "amplada_pit": 10,
+    "preu_base": 35.48,
+    "iva": 4,
+    "stock": 0
+  },
+  {
+    "id": 13,
+    "nom": "Camisa Test 13",
+    "familia": "camisa",
+    "talla_coll": 37,
+    "amplada_pit": 15,
+    "preu_base": 36.23,
+    "iva": 10,
+    "stock": 5
+  },
+  {
+    "id": 14,
+    "nom": "Camisa Test 14",
+    "familia": "camisa",
+    "talla_coll": 44,
+    "amplada_pit": 10,
+    "preu_base": 38.27,
+    "iva": 21,
+    "stock": 2
+  },
+  {
+    "id": 15,
+    "nom": "Camisa Test 15",
+    "familia": "camisa",
+    "talla_coll": 51,
+    "amplada_pit": 15,
+    "preu_base": 29.44,
+    "iva": 4,
+    "stock": 3
+  },
+  {
+    "id": 16,
+    "nom": "Camisa Test 16",
+    "familia": "camisa",
+    "talla_coll": 37,
+    "amplada_pit": 11,
+    "preu_base": 21.38,
+    "iva": 10,
+    "stock": 5
+  },
+  {
+    "id": 17,
+    "nom": "Camisa Test 17",
+    "familia": "camisa",
+    "talla_coll": 40,
+    "amplada_pit": 15,
+    "preu_base": 27.82,
+    "iva": 21,
+    "stock": 2
+  },
+  {
+    "id": 18,
+    "nom": "Camisa Test 18",
+    "familia": "camisa",
+    "talla_coll": 51,
+    "amplada_pit": 11,
+    "preu_base": 32.84,
+    "iva": 4,
+    "stock": 0
+  },
+  {
+    "id": 19,
+    "nom": "Camisa Test 19",
+    "familia": "camisa",
+    "talla_coll": 38,
+    "amplada_pit": 15,
+    "preu_base": 38.1,
+    "iva": 10,
+    "stock": 2
+  },
+  {
+    "id": 20,
+    "nom": "Camisa Test 20",
+    "familia": "camisa",
+    "talla_coll": 46,
+    "amplada_pit": 13,
+    "preu_base": 33.24,
+    "iva": 21,
+    "stock": 2
+  },
+  {
+    "id": 21,
+    "nom": "Camisa Test 21",
+    "familia": "camisa",
+    "talla_coll": 50,
+    "amplada_pit": 14,
+    "preu_base": 35.53,
+    "iva": 4,
+    "stock": 4
+  },
+  {
+    "id": 22,
+    "nom": "Camisa Test 22",
+    "familia": "camisa",
+    "talla_coll": 43,
+    "amplada_pit": 12,
+    "preu_base": 39.65,
+    "iva": 10,
+    "stock": 1
+  },
+  {
+    "id": 23,
+    "nom": "Camisa Test 23",
+    "familia": "camisa",
+    "talla_coll": 43,
+    "amplada_pit": 13,
+    "preu_base": 22.48,
+    "iva": 21,
+    "stock": 2
+  },
+  {
+    "id": 24,
+    "nom": "Camisa Test 24",
+    "familia": "camisa",
+    "talla_coll": 38,
+    "amplada_pit": 15,
+    "preu_base": 23.24,
+    "iva": 4,
+    "stock": 4
+  },
+  {
+    "id": 25,
+    "nom": "Camisa Test 25",
+    "familia": "camisa",
+    "talla_coll": 38,
+    "amplada_pit": 14,
+    "preu_base": 29.11,
+    "iva": 10,
+    "stock": 2
+  },
+  {
+    "id": 26,
+    "nom": "Camisa Test 26",
+    "familia": "camisa",
+    "talla_coll": 48,
+    "amplada_pit": 10,
+    "preu_base": 33.98,
+    "iva": 21,
+    "stock": 3
+  },
+  {
+    "id": 27,
+    "nom": "Camisa Test 27",
+    "familia": "camisa",
+    "talla_coll": 45,
+    "amplada_pit": 14,
+    "preu_base": 27.65,
+    "iva": 4,
+    "stock": 5
+  },
+  {
+    "id": 28,
+    "nom": "Camisa Test 28",
+    "familia": "camisa",
+    "talla_coll": 41,
+    "amplada_pit": 14,
+    "preu_base": 21.43,
+    "iva": 10,
+    "stock": 0
+  },
+  {
+    "id": 29,
+    "nom": "Camisa Test 29",
+    "familia": "camisa",
+    "talla_coll": 45,
+    "amplada_pit": 15,
+    "preu_base": 30.79,
+    "iva": 21,
+    "stock": 0
+  },
+  {
+    "id": 30,
+    "nom": "Camisa Test 30",
+    "familia": "camisa",
+    "talla_coll": 45,
+    "amplada_pit": 14,
+    "preu_base": 23.05,
+    "iva": 4,
+    "stock": 2
+  },
+  {
+    "id": 31,
+    "nom": "Pantaló Test 31",
+    "familia": "pantaló",
+    "talla_cintura": 43,
+    "llargada_camal": 44,
+    "preu_base": 29.08,
+    "iva": 10,
+    "stock": 4
+  },
+  {
+    "id": 32,
+    "nom": "Pantaló Test 32",
+    "familia": "pantaló",
+    "talla_cintura": 42,
+    "llargada_camal": 35,
+    "preu_base": 36.21,
+    "iva": 21,
+    "stock": 4
+  },
+  {
+    "id": 33,
+    "nom": "Pantaló Test 33",
+    "familia": "pantaló",
+    "talla_cintura": 32,
+    "llargada_camal": 35,
+    "preu_base": 29.42,
+    "iva": 4,
+    "stock": 5
+  },
+  {
+    "id": 34,
+    "nom": "Pantaló Test 34",
+    "familia": "pantaló",
+    "talla_cintura": 49,
+    "llargada_camal": 35,
+    "preu_base": 27.32,
+    "iva": 10,
+    "stock": 0
+  },
+  {
+    "id": 35,
+    "nom": "Pantaló Test 35",
+    "familia": "pantaló",
+    "talla_cintura": 27,
+    "llargada_camal": 41,
+    "preu_base": 47.45,
+    "iva": 21,
+    "stock": 1
+  },
+  {
+    "id": 36,
+    "nom": "Pantaló Test 36",
+    "familia": "pantaló",
+    "talla_cintura": 46,
+    "llargada_camal": 36,
+    "preu_base": 26.97,
+    "iva": 4,
+    "stock": 3
+  },
+  {
+    "id": 37,
+    "nom": "Pantaló Test 37",
+    "familia": "pantaló",
+    "talla_cintura": 54,
+    "llargada_camal": 45,
+    "preu_base": 33.08,
+    "iva": 10,
+    "stock": 4
+  },
+  {
+    "id": 38,
+    "nom": "Pantaló Test 38",
+    "familia": "pantaló",
+    "talla_cintura": 34,
+    "llargada_camal": 44,
+    "preu_base": 26.33,
+    "iva": 21,
+    "stock": 3
+  },
+  {
+    "id": 39,
+    "nom": "Pantaló Test 39",
+    "familia": "pantaló",
+    "talla_cintura": 32,
+    "llargada_camal": 35,
+    "preu_base": 33.06,
+    "iva": 4,
+    "stock": 3
+  },
+  {
+    "id": 40,
+    "nom": "Pantaló Test 40",
+    "familia": "pantaló",
+    "talla_cintura": 45,
+    "llargada_camal": 39,
+    "preu_base": 38.3,
+    "iva": 10,
+    "stock": 2
+  },
+  {
+    "id": 41,
+    "nom": "Pantaló Test 41",
+    "familia": "pantaló",
+    "talla_cintura": 39,
+    "llargada_camal": 35,
+    "preu_base": 25.59,
+    "iva": 21,
+    "stock": 5
+  },
+  {
+    "id": 42,
+    "nom": "Pantaló Test 42",
+    "familia": "pantaló",
+    "talla_cintura": 38,
+    "llargada_camal": 35,
+    "preu_base": 27.71,
+    "iva": 4,
+    "stock": 4
+  },
+  {
+    "id": 43,
+    "nom": "Pantaló Test 43",
+    "familia": "pantaló",
+    "talla_cintura": 56,
+    "llargada_camal": 43,
+    "preu_base": 29.42,
+    "iva": 10,
+    "stock": 1
+  },
+  {
+    "id": 44,
+    "nom": "Pantaló Test 44",
+    "familia": "pantaló",
+    "talla_cintura": 34,
+    "llargada_camal": 40,
+    "preu_base": 46.03,
+    "iva": 21,
+    "stock": 1
+  },
+  {
+    "id": 45,
+    "nom": "Pantaló Test 45",
+    "familia": "pantaló",
+    "talla_cintura": 37,
+    "llargada_camal": 43,
+    "preu_base": 31.4,
+    "iva": 4,
+    "stock": 1
+  },
+  {
+    "id": 46,
+    "nom": "Pantaló Test 46",
+    "familia": "pantaló",
+    "talla_cintura": 53,
+    "llargada_camal": 39,
+    "preu_base": 37.7,
+    "iva": 10,
+    "stock": 4
+  },
+  {
+    "id": 47,
+    "nom": "Pantaló Test 47",
+    "familia": "pantaló",
+    "talla_cintura": 27,
+    "llargada_camal": 38,
+    "preu_base": 45.66,
+    "iva": 21,
+    "stock": 4
+  },
+  {
+    "id": 48,
+    "nom": "Pantaló Test 48",
+    "familia": "pantaló",
+    "talla_cintura": 27,
+    "llargada_camal": 43,
+    "preu_base": 46.79,
+    "iva": 4,
+    "stock": 3
+  },
+  {
+    "id": 49,
+    "nom": "Pantaló Test 49",
+    "familia": "pantaló",
+    "talla_cintura": 37,
+    "llargada_camal": 42,
+    "preu_base": 30.18,
+    "iva": 10,
+    "stock": 3
+  },
+  {
+    "id": 50,
+    "nom": "Pantaló Test 50",
+    "familia": "pantaló",
+    "talla_cintura": 49,
+    "llargada_camal": 45,
+    "preu_base": 32.32,
+    "iva": 21,
+    "stock": 5
+  },
+  {
+    "id": 51,
+    "nom": "Pantaló Test 51",
+    "familia": "pantaló",
+    "talla_cintura": 49,
+    "llargada_camal": 44,
+    "preu_base": 47.26,
+    "iva": 4,
+    "stock": 0
+  },
+  {
+    "id": 52,
+    "nom": "Pantaló Test 52",
+    "familia": "pantaló",
+    "talla_cintura": 52,
+    "llargada_camal": 46,
+    "preu_base": 37.45,
+    "iva": 10,
+    "stock": 1
+  },
+  {
+    "id": 53,
+    "nom": "Pantaló Test 53",
+    "familia": "pantaló",
+    "talla_cintura": 44,
+    "llargada_camal": 42,
+    "preu_base": 43.72,
+    "iva": 21,
+    "stock": 1
+  },
+  {
+    "id": 54,
+    "nom": "Pantaló Test 54",
+    "familia": "pantaló",
+    "talla_cintura": 50,
+    "llargada_camal": 39,
+    "preu_base": 28.39,
+    "iva": 4,
+    "stock": 0
+  },
+  {
+    "id": 55,
+    "nom": "Pantaló Test 55",
+    "familia": "pantaló",
+    "talla_cintura": 49,
+    "llargada_camal": 36,
+    "preu_base": 27.27,
+    "iva": 10,
+    "stock": 0
+  },
+  {
+    "id": 56,
+    "nom": "Pantaló Test 56",
+    "familia": "pantaló",
+    "talla_cintura": 37,
+    "llargada_camal": 45,
+    "preu_base": 47.93,
+    "iva": 21,
+    "stock": 1
+  },
+  {
+    "id": 57,
+    "nom": "Pantaló Test 57",
+    "familia": "pantaló",
+    "talla_cintura": 43,
+    "llargada_camal": 40,
+    "preu_base": 41.16,
+    "iva": 4,
+    "stock": 0
+  },
+  {
+    "id": 58,
+    "nom": "Pantaló Test 58",
+    "familia": "pantaló",
+    "talla_cintura": 26,
+    "llargada_camal": 39,
+    "preu_base": 38.51,
+    "iva": 10,
+    "stock": 2
+  },
+  {
+    "id": 59,
+    "nom": "Pantaló Test 59",
+    "familia": "pantaló",
+    "talla_cintura": 27,
+    "llargada_camal": 37,
+    "preu_base": 33.19,
+    "iva": 21,
+    "stock": 3
+  },
+  {
+    "id": 60,
+    "nom": "Pantaló Test 60",
+    "familia": "pantaló",
+    "talla_cintura": 45,
+    "llargada_camal": 45,
+    "preu_base": 33.98,
+    "iva": 4,
+    "stock": 3
+  }
+]
