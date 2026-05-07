@@ -9,10 +9,10 @@ public abstract class Article {
     private final String type;
     private final ArticleType typeKey;
 
-    private int neckSize; // talla_coll: 36 - 52
+    private Integer neckSize; // talla_coll: 36 - 52
     private Integer pantsLength; // llargada_camal: 32 - 46 o null
-    private int waistSize; // talla_cintura: 24 - 56
-    private int chestWidth; // amplada_pit: 10 - 15
+    private Integer waistSize; // talla_cintura: 24 - 56
+    private Integer chestWidth; // amplada_pit: 10 - 15
 
     private double basePrice; // preu_base: preu sense IVA
     private int iva; // IVA: 4 - 21
@@ -43,14 +43,16 @@ public abstract class Article {
             int id,
             String name,
             String type,
-            int neckSize,
+            Integer neckSize,
             Integer pantsLength,
-            int waistSize,
-            int chestWidth,
+            Integer waistSize,
+            Integer chestWidth,
             double basePrice,
             int iva,
             int stock) {
+
         this.id = id;
+
         setName(name);
 
         this.typeKey = ArticleType.getType(type);
@@ -60,6 +62,7 @@ public abstract class Article {
         setPantsLength(pantsLength);
         setWaistSize(waistSize);
         setChestWidth(chestWidth);
+
         setBasePrice(basePrice);
         setIva(iva);
         setStock(stock);
@@ -84,7 +87,8 @@ public abstract class Article {
      */
     public void setName(String name) {
         if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("El nom de l'article no pot estar buit");
+            throw new IllegalArgumentException(
+                    "El nom de l'article no pot estar buit");
         }
 
         this.name = name;
@@ -107,17 +111,22 @@ public abstract class Article {
     /**
      * Retorna la talla de coll.
      */
-    public int getNeckSize() {
+    public Integer getNeckSize() {
         return neckSize;
     }
 
     /**
      * Defineix la talla de coll.
      */
-    public void setNeckSize(int neckSize) {
-        if (neckSize < MIN_NECK_SIZE || neckSize > MAX_NECK_SIZE) {
+    public void setNeckSize(Integer neckSize) {
+        if (neckSize != null &&
+                (neckSize < MIN_NECK_SIZE || neckSize > MAX_NECK_SIZE)) {
+
             throw new IllegalArgumentException(
-                    "La talla de coll ha d'estar entre " + MIN_NECK_SIZE + " i " + MAX_NECK_SIZE);
+                    "La talla de coll ha d'estar entre "
+                            + MIN_NECK_SIZE
+                            + " i "
+                            + MAX_NECK_SIZE);
         }
 
         this.neckSize = neckSize;
@@ -135,9 +144,14 @@ public abstract class Article {
      */
     public void setPantsLength(Integer pantsLength) {
         if (pantsLength != null &&
-                (pantsLength < MIN_PANTS_LENGTH || pantsLength > MAX_PANTS_LENGTH)) {
+                (pantsLength < MIN_PANTS_LENGTH
+                        || pantsLength > MAX_PANTS_LENGTH)) {
+
             throw new IllegalArgumentException(
-                    "La llargada del camal ha d'estar entre " + MIN_PANTS_LENGTH + " i " + MAX_PANTS_LENGTH);
+                    "La llargada del camal ha d'estar entre "
+                            + MIN_PANTS_LENGTH
+                            + " i "
+                            + MAX_PANTS_LENGTH);
         }
 
         this.pantsLength = pantsLength;
@@ -146,17 +160,23 @@ public abstract class Article {
     /**
      * Retorna la talla de cintura.
      */
-    public int getWaistSize() {
+    public Integer getWaistSize() {
         return waistSize;
     }
 
     /**
      * Defineix la talla de cintura.
      */
-    public void setWaistSize(int waistSize) {
-        if (waistSize < MIN_WAIST_SIZE || waistSize > MAX_WAIST_SIZE) {
+    public void setWaistSize(Integer waistSize) {
+        if (waistSize != null &&
+                (waistSize < MIN_WAIST_SIZE
+                        || waistSize > MAX_WAIST_SIZE)) {
+
             throw new IllegalArgumentException(
-                    "La talla de cintura ha d'estar entre " + MIN_WAIST_SIZE + " i " + MAX_WAIST_SIZE);
+                    "La talla de cintura ha d'estar entre "
+                            + MIN_WAIST_SIZE
+                            + " i "
+                            + MAX_WAIST_SIZE);
         }
 
         this.waistSize = waistSize;
@@ -165,17 +185,23 @@ public abstract class Article {
     /**
      * Retorna l'amplada de pit.
      */
-    public int getChestWidth() {
+    public Integer getChestWidth() {
         return chestWidth;
     }
 
     /**
      * Defineix l'amplada de pit.
      */
-    public void setChestWidth(int chestWidth) {
-        if (chestWidth < MIN_CHEST_WIDTH || chestWidth > MAX_CHEST_WIDTH) {
+    public void setChestWidth(Integer chestWidth) {
+        if (chestWidth != null &&
+                (chestWidth < MIN_CHEST_WIDTH
+                        || chestWidth > MAX_CHEST_WIDTH)) {
+
             throw new IllegalArgumentException(
-                    "L'amplada de pit ha d'estar entre " + MIN_CHEST_WIDTH + " i " + MAX_CHEST_WIDTH);
+                    "L'amplada de pit ha d'estar entre "
+                            + MIN_CHEST_WIDTH
+                            + " i "
+                            + MAX_CHEST_WIDTH);
         }
 
         this.chestWidth = chestWidth;
@@ -193,7 +219,8 @@ public abstract class Article {
      */
     public void setBasePrice(double basePrice) {
         if (basePrice < MIN_BASE_PRICE) {
-            throw new IllegalArgumentException("El preu base no pot ser negatiu");
+            throw new IllegalArgumentException(
+                    "El preu base no pot ser negatiu");
         }
 
         this.basePrice = basePrice;
@@ -212,7 +239,10 @@ public abstract class Article {
     public void setIva(int iva) {
         if (iva < MIN_IVA || iva > MAX_IVA) {
             throw new IllegalArgumentException(
-                    "L'IVA ha d'estar entre " + MIN_IVA + " i " + MAX_IVA);
+                    "L'IVA ha d'estar entre "
+                            + MIN_IVA
+                            + " i "
+                            + MAX_IVA);
         }
 
         this.iva = iva;
@@ -230,7 +260,8 @@ public abstract class Article {
      */
     public void setStock(int stock) {
         if (stock < MIN_STOCK) {
-            throw new IllegalArgumentException("L'estoc no pot ser negatiu");
+            throw new IllegalArgumentException(
+                    "L'estoc no pot ser negatiu");
         }
 
         this.stock = stock;

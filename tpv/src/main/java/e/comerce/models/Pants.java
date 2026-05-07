@@ -11,21 +11,20 @@ public class Pants extends Article {
     public Pants(
             int id,
             String name,
-            int neckSize,
             int pantsLength,
             int waistSize,
-            int chestWidth,
             double basePrice,
             int iva,
             int stock) {
+
         super(
                 id,
                 name,
                 ArticleType.PANTS.type(),
-                neckSize,
+                null,
                 pantsLength,
                 waistSize,
-                chestWidth,
+                null,
                 basePrice,
                 iva,
                 stock
