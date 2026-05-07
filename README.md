@@ -75,3 +75,6 @@ Github: https://github.com/polibanezcano2
 
 Eric Fradera  
 Github: https://github.com/eghubg
+
+Sergi Llobet
+Github: https://github.com/Sergillr
