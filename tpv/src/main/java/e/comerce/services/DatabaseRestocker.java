@@ -29,13 +29,21 @@ public final class DatabaseRestocker {
 
         List<Article> articles = loader.loadArray(RESTOCK_PATH);
         for (Article article : articles) {
-            System.out.println(article.getType());
+            db.saveArticle(article);
         }
     }
 
     public static void main(String[] args) throws IOException, SQLException {
         try (DatabaseShop shop = new DatabaseShop()) {
             DatabaseRestocker.restock(shop);
+
+            shop.findAllArticles().forEach(a -> {
+                String name = a.getName();
+                String type = a.getType();
+                double price = a.getBasePrice();
+
+                System.out.println(name + ", " + type + ", " + price + "€");
+            });
         }
     }
 }

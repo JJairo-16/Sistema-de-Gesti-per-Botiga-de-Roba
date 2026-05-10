@@ -309,7 +309,7 @@ public class DatabaseShop implements AutoCloseable {
         return new Shirt(
                 rs.getInt("id"),
                 rs.getString("nom"),
-                -1,
+                rs.getString("familia"),
                 rs.getInt("talla_coll"),
                 rs.getInt("amplada_pit"),
                 rs.getDouble("preu_base"),
@@ -327,9 +327,8 @@ public class DatabaseShop implements AutoCloseable {
         return new Pants(
                 rs.getInt("id"),
                 rs.getString("nom"),
-                -1, -1,
-                rs.getInt("talla_cintura"),
                 rs.getInt("llargada_camal"),
+                rs.getInt("talla_cintura"),
                 rs.getDouble("preu_base"),
                 rs.getInt("iva"),
                 rs.getInt("stock"));

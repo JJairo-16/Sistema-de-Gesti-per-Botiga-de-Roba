@@ -13,34 +13,22 @@ public class Shirt extends Article {
             String name,
             String type,
             int neckSize,
-            int waistSize,
             int chestWidth,
             double basePrice,
             int iva,
             int stock) {
+
         super(
                 id,
                 name,
                 type,
                 neckSize,
                 null,
-                waistSize,
+                null,
                 chestWidth,
                 basePrice,
                 iva,
                 stock
         );
-    }
-
-    public Shirt(
-            int id,
-            String name,
-            int neckSize,
-            int waistSize,
-            int chestWidth,
-            double basePrice,
-            int iva,
-            int stock) {
-        this(id, name, ArticleType.SHIRT.type(), neckSize, waistSize, chestWidth, basePrice, iva, stock);
     }
 }
