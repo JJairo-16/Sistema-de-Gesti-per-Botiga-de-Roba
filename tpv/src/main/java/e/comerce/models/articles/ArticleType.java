@@ -1,4 +1,4 @@
-package e.comerce.models;
+package e.comerce.models.articles;
 
 /**
  * Tipus d'articles disponibles.
@@ -38,8 +38,12 @@ public enum ArticleType {
      * @throws IllegalArgumentException si el tipus no existeix
      */
     public static ArticleType getType(String type) {
+        if (type == null || type.isBlank()) {
+            throw new IllegalArgumentException("El tipus d'article no pot estar buit");
+        }
+
         for (ArticleType articleType : ArticleType.values()) {
-            if (articleType.type.equals(type)) {
+            if (articleType.type().equals(type)) {
                 return articleType;
             }
         }

@@ -1,4 +1,4 @@
-package e.comerce.models;
+package e.comerce.models.articles;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -261,6 +261,32 @@ public abstract class Article {
         }
 
         this.iva = iva;
+    }
+
+    /**
+     * Retorna el preu final unitari amb IVA inclòs.
+     */
+    public double getFinalPrice() {
+        return basePrice + getIvaAmount();
+    }
+
+    /**
+     * Retorna l'import d'IVA unitari de l'article.
+     */
+    public double getIvaAmount() {
+        return basePrice * iva / 100.0;
+    }
+
+    /**
+     * Retorna el cost de producció unitari de l'article.
+     */
+    public abstract double getCostPrice();
+
+    /**
+     * Retorna el benefici unitari estimat abans d'IVA.
+     */
+    public double getProfitPerUnit() {
+        return basePrice - getCostPrice();
     }
 
     /**

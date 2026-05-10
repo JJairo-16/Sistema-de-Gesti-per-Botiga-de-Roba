@@ -1,4 +1,4 @@
-package e.comerce.models;
+package e.comerce.models.articles;
 
 /**
  * Representa un article de tipus pantalons.
@@ -28,5 +28,13 @@ public class Pants extends Article {
                 basePrice,
                 iva,
                 stock);
+    }
+
+    /**
+     * Calcula el cost unitari segons la fórmula definida per als pantalons.
+     */
+    @Override
+    public double getCostPrice() {
+        return getBasePrice() * 0.30 + getPantsLength() * 0.2;
     }
 }
