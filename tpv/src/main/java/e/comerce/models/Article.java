@@ -1,11 +1,17 @@
 package e.comerce.models;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Representa un article de la botiga.
  */
 public abstract class Article {
     private final int id;
+
+    @SerializedName("nom")
     private String name;
+
+    @SerializedName("familia")
     private final String type;
     private final ArticleType typeKey;
 
@@ -101,7 +107,8 @@ public abstract class Article {
      * Retorna el tipus d'article com a enum.
      */
     public ArticleType getTypeKey() {
-        return typeKey;
+        System.out.println(type);
+        return typeKey == null ? ArticleType.getType(type) : typeKey;
     }
 
     /**

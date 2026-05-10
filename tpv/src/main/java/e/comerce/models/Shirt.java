@@ -11,6 +11,7 @@ public class Shirt extends Article {
     public Shirt(
             int id,
             String name,
+            String type,
             int neckSize,
             int waistSize,
             int chestWidth,
@@ -20,7 +21,7 @@ public class Shirt extends Article {
         super(
                 id,
                 name,
-                ArticleType.SHIRT.type(),
+                type,
                 neckSize,
                 null,
                 waistSize,
@@ -29,5 +30,17 @@ public class Shirt extends Article {
                 iva,
                 stock
         );
+    }
+
+    public Shirt(
+            int id,
+            String name,
+            int neckSize,
+            int waistSize,
+            int chestWidth,
+            double basePrice,
+            int iva,
+            int stock) {
+        this(id, name, ArticleType.SHIRT.type(), neckSize, waistSize, chestWidth, basePrice, iva, stock);
     }
 }

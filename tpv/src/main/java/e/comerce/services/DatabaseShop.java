@@ -65,7 +65,8 @@ public class DatabaseShop implements AutoCloseable {
 
         return db.insert(
                 "INSERT INTO articles " +
-                        "(id, nom, familia, talla_coll, amplada_pit, talla_cintura, llargada_camal, preu_base, iva, stock) " +
+                        "(id, nom, familia, talla_coll, amplada_pit, talla_cintura, llargada_camal, preu_base, iva, stock) "
+                        +
                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 article.getId(),
                 article.getName(),
@@ -117,21 +118,43 @@ public class DatabaseShop implements AutoCloseable {
     }
 
     /**
-     * Insereix o actualitza un article.
+     * Insereix o actualitza un article en una sola consulta.
      *
      * @param article article a guardar
-     * @return true si s'ha inserit, false si s'ha actualitzat
+     * @return true si la consulta s'ha executat
      */
     public boolean saveArticle(Article article) throws SQLException {
         validateArticle(article);
 
-        if (existsArticle(article.getId())) {
-            updateArticle(article);
-            return false;
-        }
+        ArticleDbValues values = ArticleDbValues.from(article);
 
-        insertArticle(article);
-        return true;
+        int affectedRows = db.update(
+                "INSERT INTO articles " +
+                        "(id, nom, familia, talla_coll, amplada_pit, talla_cintura, llargada_camal, preu_base, iva, stock) "
+                        +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                        "ON DUPLICATE KEY UPDATE " +
+                        "nom = VALUES(nom), " +
+                        "familia = VALUES(familia), " +
+                        "talla_coll = VALUES(talla_coll), " +
+                        "amplada_pit = VALUES(amplada_pit), " +
+                        "talla_cintura = VALUES(talla_cintura), " +
+                        "llargada_camal = VALUES(llargada_camal), " +
+                        "preu_base = VALUES(preu_base), " +
+                        "iva = VALUES(iva), " +
+                        "stock = VALUES(stock)",
+                article.getId(),
+                article.getName(),
+                article.getType(),
+                values.neckSize,
+                values.chestWidth,
+                values.waistSize,
+                values.pantsLength,
+                article.getBasePrice(),
+                article.getIva(),
+                article.getStock());
+
+        return affectedRows > 0;
     }
 
     /**
@@ -208,7 +231,7 @@ public class DatabaseShop implements AutoCloseable {
     /**
      * Actualitza l'estoc d'un article.
      *
-     * @param id identificador de l'article
+     * @param id    identificador de l'article
      * @param stock nou estoc
      * @return true si s'ha modificat
      */
@@ -230,7 +253,7 @@ public class DatabaseShop implements AutoCloseable {
     /**
      * Redueix l'estoc si hi ha prou unitats.
      *
-     * @param id identificador de l'article
+     * @param id       identificador de l'article
      * @param quantity quantitat a reduir
      * @return true si s'ha reduït
      */
@@ -286,6 +309,7 @@ public class DatabaseShop implements AutoCloseable {
         return new Shirt(
                 rs.getInt("id"),
                 rs.getString("nom"),
+                -1,
                 rs.getInt("talla_coll"),
                 rs.getInt("amplada_pit"),
                 rs.getDouble("preu_base"),
@@ -303,6 +327,7 @@ public class DatabaseShop implements AutoCloseable {
         return new Pants(
                 rs.getInt("id"),
                 rs.getString("nom"),
+                -1, -1,
                 rs.getInt("talla_cintura"),
                 rs.getInt("llargada_camal"),
                 rs.getDouble("preu_base"),
@@ -348,7 +373,7 @@ public class DatabaseShop implements AutoCloseable {
      * Valida una clau de configuració.
      *
      * @param data dades de configuració
-     * @param key clau a validar
+     * @param key  clau a validar
      */
     private static void validateString(Map<String, String> data, String key) {
         if (!data.containsKey(key)) {
