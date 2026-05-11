@@ -1,3 +1,5 @@
+[Tornar a l'índex](../README.md)
+
 # Flux de consultes i informes
 
 Aquest document descriu com fer consultes agregades de vendes.

@@ -4,17 +4,27 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
+import e.comerce.libs.db.TableLock;
 import e.comerce.models.InvoiceLine;
 import e.comerce.models.Ticket;
 import e.comerce.services.database.ShopDatabase;
+import e.comerce.services.database.ShopTransaction;
 
 /**
  * Servei d'aplicació que registra una venda completa a la base de dades.
  *
- * <p>Centralitza la inserció del tiquet, la inserció de les línies de factura
- * i la reducció d'estoc dels articles venuts.</p>
+ * <p>
+ * Centralitza la inserció del tiquet, la inserció de les línies de factura i la
+ * reducció d'estoc dels articles venuts.
+ * </p>
  */
 public class SaleService {
+    private static final List<TableLock> SALE_TABLE_LOCKS = List.of(
+            TableLock.write("articles"),
+            TableLock.write("tiquets"),
+            TableLock.write("linies_factura"),
+            TableLock.read("clients"));
+
     private final ShopDatabase shopDatabase;
 
     /**
@@ -31,6 +41,13 @@ public class SaleService {
     /**
      * Registra una venda i actualitza l'estoc.
      *
+     * <p>
+     * Aquesta operació bloqueja les taules que participen en la venda perquè
+     * dues vendes simultànies no puguin modificar el mateix estoc alhora. Si no
+     * es poden obtenir els bloquejos dins del temps configurat, la base de dades
+     * llança un timeout i la venda no queda registrada a mitges.
+     * </p>
+     *
      * @param ticket capçalera del tiquet
      * @param invoiceLines línies de factura associades
      * @return identificador generat del tiquet
@@ -44,23 +61,25 @@ public class SaleService {
             throw new IllegalArgumentException("Una venda ha de tenir com a mínim una línia");
         }
 
-        long generatedTicketId = shopDatabase.tickets().insert(ticket);
-        int ticketId = resolveTicketId(generatedTicketId, ticket.id());
+        return shopDatabase.transactionWithTableLocks(SALE_TABLE_LOCKS, transaction -> {
+            long generatedTicketId = transaction.tickets().insert(ticket);
+            int ticketId = resolveTicketId(generatedTicketId, ticket.id());
 
-        for (InvoiceLine invoiceLine : invoiceLines) {
-            InvoiceLine invoiceLineToSave = invoiceLine.ticketId() == ticketId
-                    ? invoiceLine
-                    : invoiceLine.withTicketId(ticketId);
+            for (InvoiceLine invoiceLine : invoiceLines) {
+                InvoiceLine invoiceLineToSave = invoiceLine.ticketId() == ticketId
+                        ? invoiceLine
+                        : invoiceLine.withTicketId(ticketId);
 
-            decreaseStock(invoiceLineToSave);
-            shopDatabase.invoiceLines().insert(invoiceLineToSave);
-        }
+                decreaseStock(transaction, invoiceLineToSave);
+                transaction.invoiceLines().insert(invoiceLineToSave);
+            }
 
-        return generatedTicketId;
+            return generatedTicketId;
+        });
     }
 
-    private void decreaseStock(InvoiceLine invoiceLine) throws SQLException {
-        boolean stockUpdated = shopDatabase.articles()
+    private void decreaseStock(ShopTransaction transaction, InvoiceLine invoiceLine) throws SQLException {
+        boolean stockUpdated = transaction.articles()
                 .decreaseStock(invoiceLine.articleId(), invoiceLine.quantity());
 
         if (!stockUpdated) {

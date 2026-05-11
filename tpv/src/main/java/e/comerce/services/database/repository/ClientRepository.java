@@ -4,14 +4,14 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
-import e.comerce.libs.db.Database;
+import e.comerce.libs.db.DbExecutor;
 import e.comerce.models.Client;
 
 /** Gestiona totes les operacions de base de dades relacionades amb clients. */
 public class ClientRepository {
-    private final Database db;
+    private final DbExecutor db;
 
-    public ClientRepository(Database db) {
+    public ClientRepository(DbExecutor db) {
         this.db = Objects.requireNonNull(db, "La base de dades no pot ser nul·la");
     }
 

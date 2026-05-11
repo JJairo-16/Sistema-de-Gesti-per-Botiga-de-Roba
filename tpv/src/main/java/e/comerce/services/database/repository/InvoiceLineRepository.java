@@ -4,16 +4,16 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
-import e.comerce.libs.db.Database;
+import e.comerce.libs.db.DbExecutor;
 import e.comerce.models.InvoiceLine;
 
 /**
  * Repositori de línies de factura associades als tiquets de venda.
  */
 public class InvoiceLineRepository {
-    private final Database db;
+    private final DbExecutor db;
 
-    public InvoiceLineRepository(Database db) {
+    public InvoiceLineRepository(DbExecutor db) {
         this.db = Objects.requireNonNull(db, "La base de dades no pot ser nul·la");
     }
 

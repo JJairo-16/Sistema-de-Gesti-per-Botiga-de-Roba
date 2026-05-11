@@ -2,11 +2,14 @@ package e.comerce.services.database;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import e.comerce.libs.db.Database;
 import e.comerce.libs.db.Pool;
+import e.comerce.libs.db.TableLock;
 import e.comerce.services.database.report.SalesReportRepository;
 import e.comerce.services.database.repository.ArticleRepository;
 import e.comerce.services.database.repository.ClientRepository;
@@ -17,8 +20,10 @@ import e.comerce.utils.io.EnvReader;
 /**
  * Punt únic de connexió i accés a dades de la botiga.
  *
- * <p>Aquesta classe crea el pool de connexions i exposa només repositoris de
- * negoci. La resta de l'aplicació no hauria d'obrir connexions SQL pròpies.</p>
+ * <p>
+ * Aquesta classe crea el pool de connexions i exposa només repositoris de
+ * negoci. La resta de l'aplicació no hauria d'obrir connexions SQL pròpies.
+ * </p>
  */
 public class ShopDatabase implements AutoCloseable {
     private static final Path DEFAULT_CONFIG_PATH = Path.of("tpv/db.env");
@@ -27,7 +32,10 @@ public class ShopDatabase implements AutoCloseable {
     private static final String USER_KEY = "USER";
     private static final String PASSWORD_KEY = "PASSWORD";
 
+    public static final int DEFAULT_LOCK_TIMEOUT_SECONDS = 5;
+
     private final Pool pool;
+    private final Database database;
 
     private final ArticleRepository articles;
     private final ClientRepository clients;
@@ -61,12 +69,91 @@ public class ShopDatabase implements AutoCloseable {
                 .credentials(data.get(USER_KEY), data.get(PASSWORD_KEY))
                 .build();
 
-        Database database = new Database(pool);
+        this.database = new Database(pool);
+
         this.articles = new ArticleRepository(database);
         this.clients = new ClientRepository(database);
         this.tickets = new TicketRepository(database);
         this.invoiceLines = new InvoiceLineRepository(database);
         this.reports = new SalesReportRepository(database);
+    }
+
+    /**
+     * Executa un conjunt d'operacions de botiga dins d'una única transacció.
+     *
+     * <p>
+     * Si el treball acaba correctament, es confirma la transacció. Si qualsevol
+     * operació falla, es desfà tot el treball fet dins del bloc.
+     * </p>
+     *
+     * @param work treball a executar dins de la transacció
+     * @param <T> tipus de valor retornat
+     * @return valor retornat pel treball
+     * @throws SQLException si la base de dades retorna un error
+     */
+    public <T> T transaction(ShopWork<T> work) throws SQLException {
+        Objects.requireNonNull(work, "El treball transaccional no pot ser nul");
+
+        return database.transaction(tx -> {
+            ShopTransaction transaction = new ShopTransaction(tx);
+            return work.execute(transaction);
+        });
+    }
+
+    /**
+     * Executa una transacció de botiga amb un nivell d'aïllament concret.
+     *
+     * @param isolationLevel nivell d'aïllament de {@link java.sql.Connection}
+     * @param work treball a executar dins de la transacció
+     * @param <T> tipus de valor retornat
+     * @return valor retornat pel treball
+     * @throws SQLException si la base de dades retorna un error
+     */
+    public <T> T transaction(int isolationLevel, ShopWork<T> work) throws SQLException {
+        Objects.requireNonNull(work, "El treball transaccional no pot ser nul");
+
+        return database.transaction(isolationLevel, tx -> work.execute(new ShopTransaction(tx)));
+    }
+
+    /**
+     * Executa una transacció protegida amb bloquejos de taula.
+     *
+     * <p>
+     * Si alguna taula ja està bloquejada, la connexió espera el temps indicat.
+     * Si passat aquest temps no pot obtenir tots els bloquejos, es llança un
+     * timeout i no s'executa el treball.
+     * </p>
+     *
+     * @param locks taules que cal bloquejar
+     * @param timeoutSeconds segons màxims d'espera
+     * @param work treball a executar amb les taules bloquejades
+     * @param <T> tipus de valor retornat
+     * @return valor retornat pel treball
+     * @throws SQLException si la base de dades retorna un error
+     */
+    public <T> T transactionWithTableLocks(
+            List<TableLock> locks,
+            int timeoutSeconds,
+            ShopWork<T> work) throws SQLException {
+        Objects.requireNonNull(work, "El treball transaccional no pot ser nul");
+
+        return database.transactionWithTableLocks(
+                locks,
+                timeoutSeconds,
+                tx -> work.execute(new ShopTransaction(tx)));
+    }
+
+    /**
+     * Executa una transacció protegida amb bloquejos de taula i el timeout per defecte.
+     *
+     * @param locks taules que cal bloquejar
+     * @param work treball a executar amb les taules bloquejades
+     * @param <T> tipus de valor retornat
+     * @return valor retornat pel treball
+     * @throws SQLException si la base de dades retorna un error
+     */
+    public <T> T transactionWithTableLocks(List<TableLock> locks, ShopWork<T> work) throws SQLException {
+        return transactionWithTableLocks(locks, DEFAULT_LOCK_TIMEOUT_SECONDS, work);
     }
 
     /**

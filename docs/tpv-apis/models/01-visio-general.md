@@ -1,3 +1,5 @@
+[Tornar a l'índex](../README.md)
+
 # Paquet `models`
 
 ## Responsabilitat

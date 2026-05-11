@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
-import e.comerce.libs.db.Database;
+import e.comerce.libs.db.DbExecutor;
 import e.comerce.models.articles.Article;
 import e.comerce.models.articles.ArticleType;
 import e.comerce.models.articles.Pants;
@@ -12,9 +12,9 @@ import e.comerce.models.articles.Shirt;
 
 /** Gestiona totes les operacions de base de dades relacionades amb articles. */
 public class ArticleRepository {
-    private final Database db;
+    private final DbExecutor db;
 
-    public ArticleRepository(Database db) {
+    public ArticleRepository(DbExecutor db) {
         this.db = Objects.requireNonNull(db, "La base de dades no pot ser nul·la");
     }
 
@@ -95,6 +95,24 @@ public class ArticleRepository {
     public Article findById(int id) throws SQLException {
         validateId(id);
         return db.one(ArticleMapper.SELECT_ARTICLES + " WHERE id = ?", id, ArticleMapper::map);
+    }
+
+    /**
+     * Cerca un article i bloqueja la seva fila fins al final de la transacció.
+     *
+     * <p>
+     * Aquest mètode només té sentit dins d'una transacció. És útil quan cal
+     * llegir l'article, prendre decisions amb les seves dades i evitar canvis
+     * concurrents fins que es faci {@code commit} o {@code rollback}.
+     * </p>
+     *
+     * @param id identificador de l'article
+     * @return article trobat o {@code null}
+     * @throws SQLException si la base de dades retorna un error
+     */
+    public Article findByIdForUpdate(int id) throws SQLException {
+        validateId(id);
+        return db.one(ArticleMapper.SELECT_ARTICLES + " WHERE id = ? FOR UPDATE", id, ArticleMapper::map);
     }
 
     public List<Article> findAll() throws SQLException {
