@@ -127,6 +127,73 @@ public class ArticleRepository {
                 ArticleMapper::map);
     }
 
+    /**
+     * Cerca articles per identificador, nom o família.
+     *
+     * @param query text de cerca
+     * @return articles trobats
+     * @throws SQLException si la base de dades retorna un error
+     */
+    public List<Article> search(String query) throws SQLException {
+        if (query == null || query.isBlank()) {
+            return List.of();
+        }
+
+        String cleanQuery = query.trim();
+        String pattern = "%" + cleanQuery.toLowerCase() + "%";
+
+        if (isInteger(cleanQuery)) {
+            return db.list(
+                    ArticleMapper.SELECT_ARTICLES
+                            + " WHERE id = ? OR LOWER(nom) LIKE ? OR LOWER(familia) LIKE ? "
+                            + "ORDER BY id",
+                    new Object[] { Integer.parseInt(cleanQuery), pattern, pattern },
+                    ArticleMapper::map);
+        }
+
+        return db.list(
+                ArticleMapper.SELECT_ARTICLES
+                        + " WHERE LOWER(nom) LIKE ? OR LOWER(familia) LIKE ? "
+                        + "ORDER BY id",
+                new Object[] { pattern, pattern },
+                ArticleMapper::map);
+    }
+
+    /**
+     * Cerca articles d'un tipus concret per identificador o nom.
+     *
+     * @param type tipus d'article
+     * @param query text de cerca
+     * @return articles trobats
+     * @throws SQLException si la base de dades retorna un error
+     */
+    public List<Article> searchByType(ArticleType type, String query) throws SQLException {
+        Objects.requireNonNull(type, "El tipus d'article no pot ser nul");
+
+        if (query == null || query.isBlank()) {
+            return findByType(type);
+        }
+
+        String cleanQuery = query.trim();
+        String pattern = "%" + cleanQuery.toLowerCase() + "%";
+
+        if (isInteger(cleanQuery)) {
+            return db.list(
+                    ArticleMapper.SELECT_ARTICLES
+                            + " WHERE familia = ? AND (id = ? OR LOWER(nom) LIKE ?) "
+                            + "ORDER BY id",
+                    new Object[] { type.type(), Integer.parseInt(cleanQuery), pattern },
+                    ArticleMapper::map);
+        }
+
+        return db.list(
+                ArticleMapper.SELECT_ARTICLES
+                        + " WHERE familia = ? AND LOWER(nom) LIKE ? "
+                        + "ORDER BY id",
+                new Object[] { type.type(), pattern },
+                ArticleMapper::map);
+    }
+
     public boolean exists(int id) throws SQLException {
         validateId(id);
         return db.exists("SELECT 1 FROM articles WHERE id = ?", id);
@@ -163,6 +230,21 @@ public class ArticleRepository {
                 ArticleMapper.SELECT_ARTICLES + " WHERE stock < ? ORDER BY stock ASC, id ASC",
                 threshold,
                 ArticleMapper::map);
+    }
+
+    /**
+     * Comprova si un text representa un nombre enter.
+     *
+     * @param value text a comprovar
+     * @return {@code true} si és enter
+     */
+    private static boolean isInteger(String value) {
+        try {
+            Integer.parseInt(value);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     private static void validateArticle(Article article) {

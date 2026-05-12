@@ -1,6 +1,6 @@
 package e.comerce;
 
-import e.comerce.utils.input.AppMenus;
+import e.comerce.main.MainManager;
 import e.comerce.utils.ui.Prettier;
 
 public class App {
@@ -11,8 +11,8 @@ public class App {
 
     public void run() {
         try {
-            AppMenus app = new AppMenus();
-            app.mainMenu();
+            MainManager manager = new MainManager();
+            manager.run();
         } catch (RuntimeException e) {
             Prettier.error("L'aplicació no es pot iniciar.");
         }

@@ -77,6 +77,33 @@ public class ClientRepository {
                         rs.getString("telefon")));
     }
 
+    /**
+     * Cerca clients per DNI, nom, correu o telèfon.
+     *
+     * @param query text de cerca
+     * @return clients trobats
+     * @throws SQLException si la base de dades retorna un error
+     */
+    public List<Client> search(String query) throws SQLException {
+        if (query == null || query.isBlank()) {
+            return List.of();
+        }
+
+        String pattern = "%" + query.trim().toLowerCase() + "%";
+
+        return db.list(
+                "SELECT dni, nom, email, telefon FROM clients "
+                        + "WHERE LOWER(dni) LIKE ? OR LOWER(nom) LIKE ? "
+                        + "OR LOWER(email) LIKE ? OR LOWER(telefon) LIKE ? "
+                        + "ORDER BY nom, dni",
+                new Object[] { pattern, pattern, pattern, pattern },
+                rs -> new Client(
+                        rs.getString("dni"),
+                        rs.getString("nom"),
+                        rs.getString("email"),
+                        rs.getString("telefon")));
+    }
+
     public boolean exists(String dni) throws SQLException {
         validateDni(dni);
         return db.exists("SELECT 1 FROM clients WHERE dni = ?", dni);
