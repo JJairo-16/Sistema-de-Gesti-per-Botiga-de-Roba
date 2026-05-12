@@ -169,6 +169,14 @@ public class Pool {
             config.setMaximumPoolSize(maxPoolSize);
             config.setMinimumIdle(minIdle);
 
+            config.setConnectionTimeout(5000);
+            config.setValidationTimeout(3000);
+            config.setIdleTimeout(60000);
+            config.setMaxLifetime(1800000);
+            config.setLeakDetectionThreshold(10000);
+
+            config.setInitializationFailTimeout(-1);
+            config.setKeepaliveTime(30000);
             HikariDataSource ds = new HikariDataSource(config);
 
             return new Pool(ds);

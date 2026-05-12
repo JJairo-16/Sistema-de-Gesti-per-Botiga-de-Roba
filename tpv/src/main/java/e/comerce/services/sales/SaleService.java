@@ -37,6 +37,7 @@ public class SaleService {
      * @throws SQLException si la base de dades retorna un error
      */
     public long registerSale(Ticket ticket, List<InvoiceLine> invoiceLines) throws SQLException {
+        
         Objects.requireNonNull(ticket, "El tiquet no pot ser nul");
         Objects.requireNonNull(invoiceLines, "Les línies de factura no poden ser nul·les");
 

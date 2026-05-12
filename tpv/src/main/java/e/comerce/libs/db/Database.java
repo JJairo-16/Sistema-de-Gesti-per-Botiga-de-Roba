@@ -19,13 +19,16 @@ import javax.sql.DataSource;
  * </p>
  *
  * <ul>
- *     <li>amb mètodes directes, utilitzant el {@link Pool} intern,</li>
- *     <li>amb API fluida, utilitzant una {@link Connection} o un {@link DataSource} extern.</li>
+ * <li>amb mètodes directes, utilitzant el {@link Pool} intern,</li>
+ * <li>amb API fluida, utilitzant una {@link Connection} o un {@link DataSource}
+ * extern.</li>
  * </ul>
  *
  * <p>
- * Quan s'utilitza {@link #using(Connection)}, la connexió no es tanca per defecte.
- * Quan s'utilitza {@link #using(DataSource)}, la connexió obtinguda sí que es tanca per defecte.
+ * Quan s'utilitza {@link #using(Connection)}, la connexió no es tanca per
+ * defecte.
+ * Quan s'utilitza {@link #using(DataSource)}, la connexió obtinguda sí que es
+ * tanca per defecte.
  * </p>
  */
 public class Database {
@@ -62,7 +65,7 @@ public class Database {
     /**
      * Crea un context fluït utilitzant una connexió externa.
      *
-     * @param conn connexió externa
+     * @param conn            connexió externa
      * @param closeConnection indica si la connexió s'ha de tancar automàticament
      * @return context fluït de base de dades
      */
@@ -74,7 +77,8 @@ public class Database {
      * Crea un context fluït utilitzant un {@link DataSource}.
      *
      * <p>
-     * Per defecte, la connexió obtinguda del {@link DataSource} sí que es tanca automàticament.
+     * Per defecte, la connexió obtinguda del {@link DataSource} sí que es tanca
+     * automàticament.
      * </p>
      *
      * @param src DataSource extern
@@ -87,8 +91,9 @@ public class Database {
     /**
      * Crea un context fluït utilitzant un {@link DataSource}.
      *
-     * @param src DataSource extern
-     * @param closeConnection indica si la connexió obtinguda s'ha de tancar automàticament
+     * @param src             DataSource extern
+     * @param closeConnection indica si la connexió obtinguda s'ha de tancar
+     *                        automàticament
      * @return context fluït de base de dades
      */
     public Context using(DataSource src, boolean closeConnection) {
@@ -98,9 +103,9 @@ public class Database {
     /**
      * Executa una consulta SQL que espera obtenir una única fila sense paràmetres.
      *
-     * @param sql consulta SQL completa
+     * @param sql    consulta SQL completa
      * @param mapper funció que converteix la fila en un objecte
-     * @param <T> tipus d'objecte retornat
+     * @param <T>    tipus d'objecte retornat
      * @return objecte trobat o {@code null}
      * @throws SQLException si hi ha un error SQL
      */
@@ -111,10 +116,10 @@ public class Database {
     /**
      * Executa una consulta SQL que espera obtenir una única fila.
      *
-     * @param sql consulta SQL completa
+     * @param sql    consulta SQL completa
      * @param params paràmetres que substituiran els {@code ?}
      * @param mapper funció que converteix la fila en un objecte
-     * @param <T> tipus d'objecte retornat
+     * @param <T>    tipus d'objecte retornat
      * @return objecte trobat o {@code null}
      * @throws SQLException si hi ha un error SQL
      */
@@ -126,10 +131,10 @@ public class Database {
      * Sobrecàrrega de {@link #one(String, Params, RowMapper)} per a consultes
      * amb un únic paràmetre.
      *
-     * @param sql consulta SQL completa
-     * @param param paràmetre que substituirà el {@code ?}
+     * @param sql    consulta SQL completa
+     * @param param  paràmetre que substituirà el {@code ?}
      * @param mapper funció que converteix la fila en un objecte
-     * @param <T> tipus d'objecte retornat
+     * @param <T>    tipus d'objecte retornat
      * @return objecte trobat o {@code null}
      * @throws SQLException si hi ha un error SQL
      */
@@ -141,10 +146,10 @@ public class Database {
      * Sobrecàrrega de {@link #one(String, Params, RowMapper)} per a consultes
      * amb diversos paràmetres.
      *
-     * @param sql consulta SQL completa
+     * @param sql    consulta SQL completa
      * @param params paràmetres que substituiran els {@code ?}
      * @param mapper funció que converteix la fila en un objecte
-     * @param <T> tipus d'objecte retornat
+     * @param <T>    tipus d'objecte retornat
      * @return objecte trobat o {@code null}
      * @throws SQLException si hi ha un error SQL
      */
@@ -155,9 +160,9 @@ public class Database {
     /**
      * Executa una consulta SQL que retorna diverses files sense paràmetres.
      *
-     * @param sql consulta SQL completa
+     * @param sql    consulta SQL completa
      * @param mapper funció que converteix cada fila en un objecte
-     * @param <T> tipus d'objecte de cada element de la llista
+     * @param <T>    tipus d'objecte de cada element de la llista
      * @return llista d'objectes trobats
      * @throws SQLException si hi ha un error SQL
      */
@@ -168,10 +173,10 @@ public class Database {
     /**
      * Executa una consulta SQL que retorna diverses files.
      *
-     * @param sql consulta SQL completa
+     * @param sql    consulta SQL completa
      * @param params paràmetres que substituiran els {@code ?}
      * @param mapper funció que converteix cada fila en un objecte
-     * @param <T> tipus d'objecte de cada element de la llista
+     * @param <T>    tipus d'objecte de cada element de la llista
      * @return llista d'objectes trobats
      * @throws SQLException si hi ha un error SQL
      */
@@ -183,10 +188,10 @@ public class Database {
      * Sobrecàrrega de {@link #list(String, Params, RowMapper)} per a consultes
      * amb un únic paràmetre.
      *
-     * @param sql consulta SQL completa
-     * @param param paràmetre que substituirà el {@code ?}
+     * @param sql    consulta SQL completa
+     * @param param  paràmetre que substituirà el {@code ?}
      * @param mapper funció que converteix cada fila en un objecte
-     * @param <T> tipus d'objecte de cada element de la llista
+     * @param <T>    tipus d'objecte de cada element de la llista
      * @return llista d'objectes trobats
      * @throws SQLException si hi ha un error SQL
      */
@@ -198,10 +203,10 @@ public class Database {
      * Sobrecàrrega de {@link #list(String, Params, RowMapper)} per a consultes
      * amb diversos paràmetres.
      *
-     * @param sql consulta SQL completa
+     * @param sql    consulta SQL completa
      * @param params paràmetres que substituiran els {@code ?}
      * @param mapper funció que converteix cada fila en un objecte
-     * @param <T> tipus d'objecte de cada element de la llista
+     * @param <T>    tipus d'objecte de cada element de la llista
      * @return llista d'objectes trobats
      * @throws SQLException si hi ha un error SQL
      */
@@ -212,7 +217,7 @@ public class Database {
     /**
      * Executa una sentència SQL de modificació.
      *
-     * @param sql sentència SQL completa
+     * @param sql    sentència SQL completa
      * @param params paràmetres que substituiran els {@code ?}
      * @return nombre de files afectades
      * @throws SQLException si hi ha un error SQL
@@ -225,7 +230,7 @@ public class Database {
      * Sobrecàrrega de {@link #update(String, Params)} que permet passar
      * els paràmetres directament.
      *
-     * @param sql sentència SQL completa
+     * @param sql    sentència SQL completa
      * @param params paràmetres que substituiran els {@code ?}
      * @return nombre de files afectades
      * @throws SQLException si hi ha un error SQL
@@ -237,7 +242,7 @@ public class Database {
     /**
      * Executa una sentència {@code INSERT} i retorna la clau generada.
      *
-     * @param sql sentència {@code INSERT} completa
+     * @param sql    sentència {@code INSERT} completa
      * @param params paràmetres que substituiran els {@code ?}
      * @return clau generada o {@code -1}
      * @throws SQLException si hi ha un error SQL
@@ -250,7 +255,7 @@ public class Database {
      * Sobrecàrrega de {@link #insert(String, Params)} que permet passar
      * els paràmetres directament.
      *
-     * @param sql sentència {@code INSERT} completa
+     * @param sql    sentència {@code INSERT} completa
      * @param params paràmetres que substituiran els {@code ?}
      * @return clau generada o {@code -1}
      * @throws SQLException si hi ha un error SQL
@@ -262,7 +267,7 @@ public class Database {
     /**
      * Executa una sentència {@code DELETE}.
      *
-     * @param sql sentència {@code DELETE} completa
+     * @param sql    sentència {@code DELETE} completa
      * @param params paràmetres que substituiran els {@code ?}
      * @return nombre de files eliminades
      * @throws SQLException si hi ha un error SQL
@@ -275,7 +280,7 @@ public class Database {
      * Sobrecàrrega de {@link #delete(String, Params)} que permet passar
      * els paràmetres directament.
      *
-     * @param sql sentència {@code DELETE} completa
+     * @param sql    sentència {@code DELETE} completa
      * @param params paràmetres que substituiran els {@code ?}
      * @return nombre de files eliminades
      * @throws SQLException si hi ha un error SQL
@@ -287,7 +292,7 @@ public class Database {
     /**
      * Comprova si una consulta retorna almenys una fila.
      *
-     * @param sql consulta SQL completa
+     * @param sql    consulta SQL completa
      * @param params paràmetres que substituiran els {@code ?}
      * @return {@code true} si la consulta retorna alguna fila
      * @throws SQLException si hi ha un error SQL
@@ -300,7 +305,7 @@ public class Database {
      * Sobrecàrrega de {@link #exists(String, Params)} que permet passar
      * els paràmetres directament.
      *
-     * @param sql consulta SQL completa
+     * @param sql    consulta SQL completa
      * @param params paràmetres que substituiran els {@code ?}
      * @return {@code true} si la consulta retorna alguna fila
      * @throws SQLException si hi ha un error SQL
@@ -312,7 +317,7 @@ public class Database {
     /**
      * Executa una consulta que retorna un comptador.
      *
-     * @param sql consulta SQL completa
+     * @param sql    consulta SQL completa
      * @param params paràmetres que substituiran els {@code ?}
      * @return valor numèric de la primera columna, o {@code 0} si no hi ha resultat
      * @throws SQLException si hi ha un error SQL
@@ -325,7 +330,7 @@ public class Database {
      * Sobrecàrrega de {@link #count(String, Params)} que permet passar
      * els paràmetres directament.
      *
-     * @param sql consulta SQL completa
+     * @param sql    consulta SQL completa
      * @param params paràmetres que substituiran els {@code ?}
      * @return valor numèric de la primera columna, o {@code 0} si no hi ha resultat
      * @throws SQLException si hi ha un error SQL
@@ -371,9 +376,9 @@ public class Database {
         /**
          * Executa una consulta SQL que espera obtenir una única fila sense paràmetres.
          *
-         * @param sql consulta SQL completa
+         * @param sql    consulta SQL completa
          * @param mapper funció que converteix la fila en un objecte
-         * @param <T> tipus d'objecte retornat
+         * @param <T>    tipus d'objecte retornat
          * @return objecte trobat o {@code null}
          * @throws SQLException si hi ha un error SQL
          */
@@ -384,10 +389,10 @@ public class Database {
         /**
          * Executa una consulta SQL que espera obtenir una única fila.
          *
-         * @param sql consulta SQL completa
+         * @param sql    consulta SQL completa
          * @param params paràmetres que substituiran els {@code ?}
          * @param mapper funció que converteix la fila en un objecte
-         * @param <T> tipus d'objecte retornat
+         * @param <T>    tipus d'objecte retornat
          * @return objecte trobat o {@code null}
          * @throws SQLException si hi ha un error SQL
          */
@@ -409,10 +414,10 @@ public class Database {
          * Sobrecàrrega de {@link #one(String, Params, RowMapper)} per a consultes
          * amb un únic paràmetre.
          *
-         * @param sql consulta SQL completa
-         * @param param paràmetre que substituirà el {@code ?}
+         * @param sql    consulta SQL completa
+         * @param param  paràmetre que substituirà el {@code ?}
          * @param mapper funció que converteix la fila en un objecte
-         * @param <T> tipus d'objecte retornat
+         * @param <T>    tipus d'objecte retornat
          * @return objecte trobat o {@code null}
          * @throws SQLException si hi ha un error SQL
          */
@@ -424,10 +429,10 @@ public class Database {
          * Sobrecàrrega de {@link #one(String, Params, RowMapper)} per a consultes
          * amb diversos paràmetres.
          *
-         * @param sql consulta SQL completa
+         * @param sql    consulta SQL completa
          * @param params paràmetres que substituiran els {@code ?}
          * @param mapper funció que converteix la fila en un objecte
-         * @param <T> tipus d'objecte retornat
+         * @param <T>    tipus d'objecte retornat
          * @return objecte trobat o {@code null}
          * @throws SQLException si hi ha un error SQL
          */
@@ -438,9 +443,9 @@ public class Database {
         /**
          * Executa una consulta SQL que retorna diverses files sense paràmetres.
          *
-         * @param sql consulta SQL completa
+         * @param sql    consulta SQL completa
          * @param mapper funció que converteix cada fila en un objecte
-         * @param <T> tipus d'objecte de cada element de la llista
+         * @param <T>    tipus d'objecte de cada element de la llista
          * @return llista d'objectes trobats
          * @throws SQLException si hi ha un error SQL
          */
@@ -451,10 +456,10 @@ public class Database {
         /**
          * Executa una consulta SQL que retorna diverses files.
          *
-         * @param sql consulta SQL completa
+         * @param sql    consulta SQL completa
          * @param params paràmetres que substituiran els {@code ?}
          * @param mapper funció que converteix cada fila en un objecte
-         * @param <T> tipus d'objecte de cada element de la llista
+         * @param <T>    tipus d'objecte de cada element de la llista
          * @return llista d'objectes trobats
          * @throws SQLException si hi ha un error SQL
          */
@@ -482,10 +487,10 @@ public class Database {
          * Sobrecàrrega de {@link #list(String, Params, RowMapper)} per a consultes
          * amb un únic paràmetre.
          *
-         * @param sql consulta SQL completa
-         * @param param paràmetre que substituirà el {@code ?}
+         * @param sql    consulta SQL completa
+         * @param param  paràmetre que substituirà el {@code ?}
          * @param mapper funció que converteix cada fila en un objecte
-         * @param <T> tipus d'objecte de cada element de la llista
+         * @param <T>    tipus d'objecte de cada element de la llista
          * @return llista d'objectes trobats
          * @throws SQLException si hi ha un error SQL
          */
@@ -497,10 +502,10 @@ public class Database {
          * Sobrecàrrega de {@link #list(String, Params, RowMapper)} per a consultes
          * amb diversos paràmetres.
          *
-         * @param sql consulta SQL completa
+         * @param sql    consulta SQL completa
          * @param params paràmetres que substituiran els {@code ?}
          * @param mapper funció que converteix cada fila en un objecte
-         * @param <T> tipus d'objecte de cada element de la llista
+         * @param <T>    tipus d'objecte de cada element de la llista
          * @return llista d'objectes trobats
          * @throws SQLException si hi ha un error SQL
          */
@@ -516,7 +521,7 @@ public class Database {
          * que retornin un nombre de files afectades.
          * </p>
          *
-         * @param sql sentència SQL completa
+         * @param sql    sentència SQL completa
          * @param params paràmetres que substituiran els {@code ?}
          * @return nombre de files afectades
          * @throws SQLException si hi ha un error SQL
@@ -536,7 +541,7 @@ public class Database {
          * Sobrecàrrega de {@link #update(String, Params)} que permet passar
          * els paràmetres directament.
          *
-         * @param sql sentència SQL completa
+         * @param sql    sentència SQL completa
          * @param params paràmetres que substituiran els {@code ?}
          * @return nombre de files afectades
          * @throws SQLException si hi ha un error SQL
@@ -552,7 +557,7 @@ public class Database {
          * Si no es genera cap clau automàtica, retorna {@code -1}.
          * </p>
          *
-         * @param sql sentència {@code INSERT} completa
+         * @param sql    sentència {@code INSERT} completa
          * @param params paràmetres que substituiran els {@code ?}
          * @return clau generada o {@code -1}
          * @throws SQLException si hi ha un error SQL
@@ -576,7 +581,7 @@ public class Database {
          * Sobrecàrrega de {@link #insert(String, Params)} que permet passar
          * els paràmetres directament.
          *
-         * @param sql sentència {@code INSERT} completa
+         * @param sql    sentència {@code INSERT} completa
          * @param params paràmetres que substituiran els {@code ?}
          * @return clau generada o {@code -1}
          * @throws SQLException si hi ha un error SQL
@@ -588,7 +593,7 @@ public class Database {
         /**
          * Executa una sentència {@code DELETE}.
          *
-         * @param sql sentència {@code DELETE} completa
+         * @param sql    sentència {@code DELETE} completa
          * @param params paràmetres que substituiran els {@code ?}
          * @return nombre de files eliminades
          * @throws SQLException si hi ha un error SQL
@@ -601,7 +606,7 @@ public class Database {
          * Sobrecàrrega de {@link #delete(String, Params)} que permet passar
          * els paràmetres directament.
          *
-         * @param sql sentència {@code DELETE} completa
+         * @param sql    sentència {@code DELETE} completa
          * @param params paràmetres que substituiran els {@code ?}
          * @return nombre de files eliminades
          * @throws SQLException si hi ha un error SQL
@@ -613,7 +618,7 @@ public class Database {
         /**
          * Comprova si una consulta retorna almenys una fila.
          *
-         * @param sql consulta SQL completa
+         * @param sql    consulta SQL completa
          * @param params paràmetres que substituiran els {@code ?}
          * @return {@code true} si la consulta retorna alguna fila
          * @throws SQLException si hi ha un error SQL
@@ -627,7 +632,7 @@ public class Database {
          * Sobrecàrrega de {@link #exists(String, Params)} que permet passar
          * els paràmetres directament.
          *
-         * @param sql consulta SQL completa
+         * @param sql    consulta SQL completa
          * @param params paràmetres que substituiran els {@code ?}
          * @return {@code true} si la consulta retorna alguna fila
          * @throws SQLException si hi ha un error SQL
@@ -644,7 +649,7 @@ public class Database {
          * Normalment s'utilitza amb {@code COUNT(*)}.
          * </p>
          *
-         * @param sql consulta SQL completa
+         * @param sql    consulta SQL completa
          * @param params paràmetres que substituiran els {@code ?}
          * @return valor numèric de la primera columna, o {@code 0} si no hi ha resultat
          * @throws SQLException si hi ha un error SQL
@@ -658,7 +663,7 @@ public class Database {
          * Sobrecàrrega de {@link #count(String, Params)} que permet passar
          * els paràmetres directament.
          *
-         * @param sql consulta SQL completa
+         * @param sql    consulta SQL completa
          * @param params paràmetres que substituiran els {@code ?}
          * @return valor numèric de la primera columna, o {@code 0} si no hi ha resultat
          * @throws SQLException si hi ha un error SQL
@@ -693,7 +698,7 @@ public class Database {
          * Assigna automàticament els valors rebuts als símbols {@code ?}
          * del {@link PreparedStatement}.
          *
-         * @param stmt sentència preparada
+         * @param stmt   sentència preparada
          * @param params paràmetres a assignar
          * @throws SQLException si hi ha un error assignant els valors
          */
@@ -717,6 +722,20 @@ public class Database {
             if (mapper == null) {
                 throw new IllegalArgumentException("El mapper no pot ser nul.");
             }
+        }
+    }
+
+    /**
+     * Comprova si la connexió a la base de dades és vàlida.
+     *
+     * @return {@code true} si es pot establir una connexió vàlida, {@code false} en
+     *         cas contrari
+     */
+    public boolean isConnected() {
+        try (Connection conn = pool.getDataSource().getConnection()) {
+            return conn.isValid(3);
+        } catch (SQLException e) {
+            return false;
         }
     }
 
