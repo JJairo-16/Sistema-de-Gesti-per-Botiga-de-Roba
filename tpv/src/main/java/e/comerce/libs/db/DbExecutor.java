@@ -3,6 +3,8 @@ package e.comerce.libs.db;
 import java.sql.SQLException;
 import java.util.List;
 
+import e.comerce.libs.db.functional.RowMapper;
+
 /**
  * Contracte comú per executar operacions SQL.
  *

@@ -1,4 +1,4 @@
-package e.comerce.libs.db;
+package e.comerce.libs.db.table;
 
 import java.sql.SQLTimeoutException;
 

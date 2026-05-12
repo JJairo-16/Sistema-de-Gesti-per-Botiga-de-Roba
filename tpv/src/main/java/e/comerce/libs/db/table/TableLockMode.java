@@ -1,4 +1,4 @@
-package e.comerce.libs.db;
+package e.comerce.libs.db.table;
 
 /** Mode de bloqueig que s'aplicarà sobre una taula. */
 public enum TableLockMode {

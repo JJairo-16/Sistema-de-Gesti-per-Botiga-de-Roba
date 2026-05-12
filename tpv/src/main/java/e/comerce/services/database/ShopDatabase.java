@@ -9,7 +9,7 @@ import java.util.Objects;
 
 import e.comerce.libs.db.Database;
 import e.comerce.libs.db.Pool;
-import e.comerce.libs.db.TableLock;
+import e.comerce.libs.db.table.TableLock;
 import e.comerce.services.database.report.SalesReportRepository;
 import e.comerce.services.database.repository.ArticleRepository;
 import e.comerce.services.database.repository.ClientRepository;

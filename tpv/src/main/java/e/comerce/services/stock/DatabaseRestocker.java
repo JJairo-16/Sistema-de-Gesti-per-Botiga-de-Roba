@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
-import e.comerce.libs.db.TableLock;
+import e.comerce.libs.db.table.TableLock;
 import e.comerce.libs.json.PolymorphicJsonLoader;
 import e.comerce.models.articles.Article;
 import e.comerce.models.articles.ArticleType;

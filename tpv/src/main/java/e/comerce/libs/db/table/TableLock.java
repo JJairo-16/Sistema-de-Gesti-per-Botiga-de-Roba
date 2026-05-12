@@ -1,4 +1,4 @@
-package e.comerce.libs.db;
+package e.comerce.libs.db.table;
 
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -25,7 +25,7 @@ public final class TableLock {
         return new TableLock(tableName, TableLockMode.WRITE);
     }
 
-    String toSql() {
+    public String toSql() {
         return tableName + " " + mode.sql();
     }
 

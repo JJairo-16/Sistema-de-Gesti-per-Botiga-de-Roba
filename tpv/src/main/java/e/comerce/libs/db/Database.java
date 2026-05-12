@@ -7,6 +7,12 @@ import java.util.Objects;
 
 import javax.sql.DataSource;
 
+import e.comerce.libs.db.functional.RowMapper;
+import e.comerce.libs.db.functional.SqlRunnable;
+import e.comerce.libs.db.functional.SqlWork;
+import e.comerce.libs.db.table.TableLock;
+import e.comerce.libs.db.table.TableLockTimeoutException;
+
 /**
  * Classe principal per treballar amb la base de dades de manera senzilla.
  *
@@ -105,6 +111,7 @@ public class Database implements DbExecutor {
      * @return objecte trobat o {@code null}
      * @throws SQLException si hi ha un error SQL
      */
+    @Override
     public <T> T one(String sql, RowMapper<T> mapper) throws SQLException {
         return one(sql, Params.none(), mapper);
     }
@@ -134,6 +141,7 @@ public class Database implements DbExecutor {
      * @return objecte trobat o {@code null}
      * @throws SQLException si hi ha un error SQL
      */
+    @Override
     public <T> T one(String sql, Object param, RowMapper<T> mapper) throws SQLException {
         return one(sql, Params.of(param), mapper);
     }
@@ -149,6 +157,7 @@ public class Database implements DbExecutor {
      * @return objecte trobat o {@code null}
      * @throws SQLException si hi ha un error SQL
      */
+    @Override
     public <T> T one(String sql, Object[] params, RowMapper<T> mapper) throws SQLException {
         return one(sql, Params.of(params), mapper);
     }
@@ -162,6 +171,7 @@ public class Database implements DbExecutor {
      * @return llista d'objectes trobats
      * @throws SQLException si hi ha un error SQL
      */
+    @Override
     public <T> List<T> list(String sql, RowMapper<T> mapper) throws SQLException {
         return list(sql, Params.none(), mapper);
     }
@@ -191,6 +201,7 @@ public class Database implements DbExecutor {
      * @return llista d'objectes trobats
      * @throws SQLException si hi ha un error SQL
      */
+    @Override
     public <T> List<T> list(String sql, Object param, RowMapper<T> mapper) throws SQLException {
         return list(sql, Params.of(param), mapper);
     }
@@ -206,6 +217,7 @@ public class Database implements DbExecutor {
      * @return llista d'objectes trobats
      * @throws SQLException si hi ha un error SQL
      */
+    @Override
     public <T> List<T> list(String sql, Object[] params, RowMapper<T> mapper) throws SQLException {
         return list(sql, Params.of(params), mapper);
     }
@@ -231,6 +243,7 @@ public class Database implements DbExecutor {
      * @return nombre de files afectades
      * @throws SQLException si hi ha un error SQL
      */
+    @Override
     public int update(String sql, Object... params) throws SQLException {
         return update(sql, Params.of(params));
     }
@@ -256,6 +269,7 @@ public class Database implements DbExecutor {
      * @return clau generada o {@code -1}
      * @throws SQLException si hi ha un error SQL
      */
+    @Override
     public long insert(String sql, Object... params) throws SQLException {
         return insert(sql, Params.of(params));
     }
@@ -281,6 +295,7 @@ public class Database implements DbExecutor {
      * @return nombre de files eliminades
      * @throws SQLException si hi ha un error SQL
      */
+    @Override
     public int delete(String sql, Object... params) throws SQLException {
         return delete(sql, Params.of(params));
     }
@@ -306,6 +321,7 @@ public class Database implements DbExecutor {
      * @return {@code true} si la consulta retorna alguna fila
      * @throws SQLException si hi ha un error SQL
      */
+    @Override
     public boolean exists(String sql, Object... params) throws SQLException {
         return exists(sql, Params.of(params));
     }
@@ -331,6 +347,7 @@ public class Database implements DbExecutor {
      * @return valor numèric de la primera columna, o {@code 0} si no hi ha resultat
      * @throws SQLException si hi ha un error SQL
      */
+    @Override
     public long count(String sql, Object... params) throws SQLException {
         return count(sql, Params.of(params));
     }
@@ -636,6 +653,7 @@ public class Database implements DbExecutor {
          * @return objecte trobat o {@code null}
          * @throws SQLException si hi ha un error SQL
          */
+        @Override
         public <T> T one(String sql, RowMapper<T> mapper) throws SQLException {
             return one(sql, Params.none(), mapper);
         }
@@ -675,6 +693,7 @@ public class Database implements DbExecutor {
          * @return objecte trobat o {@code null}
          * @throws SQLException si hi ha un error SQL
          */
+        @Override
         public <T> T one(String sql, Object param, RowMapper<T> mapper) throws SQLException {
             return one(sql, Params.of(param), mapper);
         }
@@ -690,6 +709,7 @@ public class Database implements DbExecutor {
          * @return objecte trobat o {@code null}
          * @throws SQLException si hi ha un error SQL
          */
+        @Override
         public <T> T one(String sql, Object[] params, RowMapper<T> mapper) throws SQLException {
             return one(sql, Params.of(params), mapper);
         }
@@ -703,6 +723,7 @@ public class Database implements DbExecutor {
          * @return llista d'objectes trobats
          * @throws SQLException si hi ha un error SQL
          */
+        @Override
         public <T> List<T> list(String sql, RowMapper<T> mapper) throws SQLException {
             return list(sql, Params.none(), mapper);
         }
@@ -748,6 +769,7 @@ public class Database implements DbExecutor {
          * @return llista d'objectes trobats
          * @throws SQLException si hi ha un error SQL
          */
+        @Override
         public <T> List<T> list(String sql, Object param, RowMapper<T> mapper) throws SQLException {
             return list(sql, Params.of(param), mapper);
         }
@@ -763,6 +785,7 @@ public class Database implements DbExecutor {
          * @return llista d'objectes trobats
          * @throws SQLException si hi ha un error SQL
          */
+        @Override
         public <T> List<T> list(String sql, Object[] params, RowMapper<T> mapper) throws SQLException {
             return list(sql, Params.of(params), mapper);
         }
@@ -800,6 +823,7 @@ public class Database implements DbExecutor {
          * @return nombre de files afectades
          * @throws SQLException si hi ha un error SQL
          */
+        @Override
         public int update(String sql, Object... params) throws SQLException {
             return update(sql, Params.of(params));
         }
@@ -840,6 +864,7 @@ public class Database implements DbExecutor {
          * @return clau generada o {@code -1}
          * @throws SQLException si hi ha un error SQL
          */
+        @Override
         public long insert(String sql, Object... params) throws SQLException {
             return insert(sql, Params.of(params));
         }
@@ -865,6 +890,7 @@ public class Database implements DbExecutor {
          * @return nombre de files eliminades
          * @throws SQLException si hi ha un error SQL
          */
+        @Override
         public int delete(String sql, Object... params) throws SQLException {
             return delete(sql, Params.of(params));
         }
@@ -891,6 +917,7 @@ public class Database implements DbExecutor {
          * @return {@code true} si la consulta retorna alguna fila
          * @throws SQLException si hi ha un error SQL
          */
+        @Override
         public boolean exists(String sql, Object... params) throws SQLException {
             return exists(sql, Params.of(params));
         }
@@ -922,6 +949,7 @@ public class Database implements DbExecutor {
          * @return valor numèric de la primera columna, o {@code 0} si no hi ha resultat
          * @throws SQLException si hi ha un error SQL
          */
+        @Override
         public long count(String sql, Object... params) throws SQLException {
             return count(sql, Params.of(params));
         }
