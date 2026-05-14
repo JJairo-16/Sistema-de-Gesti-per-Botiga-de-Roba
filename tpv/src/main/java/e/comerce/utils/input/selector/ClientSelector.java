@@ -271,9 +271,9 @@ public final class ClientSelector {
         return String.format(
                 "%s - %s - %s - %s",
                 safe(client.dni()),
-                safe(client.nom()),
+                safe(client.name()),
                 safe(client.email()),
-                safe(client.telefon()));
+                safe(client.phone()));
     }
 
     /**

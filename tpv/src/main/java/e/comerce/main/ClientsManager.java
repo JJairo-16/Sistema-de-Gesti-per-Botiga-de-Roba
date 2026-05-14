@@ -219,9 +219,9 @@ public final class ClientsManager {
         return String.format(
                 "DNI: %s%nNom: %s%nCorreu electrònic: %s%nTelèfon: %s",
                 safe(client.dni()),
-                safe(client.nom()),
+                safe(client.name()),
                 safe(client.email()),
-                safe(client.telefon()));
+                safe(client.phone()));
     }
 
     /**

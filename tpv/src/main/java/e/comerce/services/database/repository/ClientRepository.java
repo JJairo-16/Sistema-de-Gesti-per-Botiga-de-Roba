@@ -20,9 +20,9 @@ public class ClientRepository {
         return db.update(
                 "INSERT INTO clients (dni, nom, email, telefon) VALUES (?, ?, ?, ?)",
                 client.dni(),
-                client.nom(),
+                client.name(),
                 client.email(),
-                client.telefon()) > 0;
+                client.phone()) > 0;
     }
 
     public boolean save(Client client) throws SQLException {
@@ -31,18 +31,18 @@ public class ClientRepository {
                 "INSERT INTO clients (dni, nom, email, telefon) VALUES (?, ?, ?, ?) "
                         + "ON DUPLICATE KEY UPDATE nom = VALUES(nom), email = VALUES(email), telefon = VALUES(telefon)",
                 client.dni(),
-                client.nom(),
+                client.name(),
                 client.email(),
-                client.telefon()) > 0;
+                client.phone()) > 0;
     }
 
     public boolean update(Client client) throws SQLException {
         validateClient(client);
         return db.update(
                 "UPDATE clients SET nom = ?, email = ?, telefon = ? WHERE dni = ?",
-                client.nom(),
+                client.name(),
                 client.email(),
-                client.telefon(),
+                client.phone(),
                 client.dni()) > 0;
     }
 
