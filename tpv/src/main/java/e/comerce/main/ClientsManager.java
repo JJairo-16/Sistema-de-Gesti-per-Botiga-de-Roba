@@ -26,6 +26,7 @@ public final class ClientsManager {
     private static final int EXIT_OPTION = CLIENT_OPTIONS.size();
 
     private final ClientRepository repo;
+    private final ObjectInput input;
     private final ClientSelector selector;
     private final Cleaner cleaner;
 
@@ -37,6 +38,7 @@ public final class ClientsManager {
      */
     public ClientsManager(ShopDatabase shop, Cleaner cleaner) {
         this.repo = shop.clients();
+        this.input = new ObjectInput(shop.families());
         this.selector = new ClientSelector(shop);
         this.cleaner = cleaner;
     }
@@ -99,7 +101,7 @@ public final class ClientsManager {
     private void registerClient() {
         Prettier.info("Si us plau, ompli les dades del nou client:");
 
-        Client client = ObjectInput.askClient();
+        Client client = input.askClient();
 
         if (client == null) {
             return;
@@ -167,7 +169,7 @@ public final class ClientsManager {
         Prettier.info("Introdueix les noves dades del client.");
         Prettier.info("El DNI s'ha de mantenir igual: %s", oldClient.dni());
 
-        Client newClient = ObjectInput.askClient();
+        Client newClient = input.askClient();
 
         if (newClient == null) {
             return;

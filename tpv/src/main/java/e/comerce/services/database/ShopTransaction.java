@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import e.comerce.libs.db.DbExecutor;
 import e.comerce.services.database.report.SalesReportRepository;
+import e.comerce.services.database.repository.ArticleFamilyRepository;
 import e.comerce.services.database.repository.ArticleRepository;
 import e.comerce.services.database.repository.ClientRepository;
 import e.comerce.services.database.repository.InvoiceLineRepository;
@@ -19,6 +20,7 @@ import e.comerce.services.database.repository.TicketRepository;
  * </p>
  */
 public final class ShopTransaction {
+    private final ArticleFamilyRepository families;
     private final ArticleRepository articles;
     private final ClientRepository clients;
     private final TicketRepository tickets;
@@ -33,11 +35,21 @@ public final class ShopTransaction {
     public ShopTransaction(DbExecutor db) {
         Objects.requireNonNull(db, "L'executor de base de dades no pot ser nul");
 
-        this.articles = new ArticleRepository(db);
+        this.families = new ArticleFamilyRepository(db);
+        this.articles = new ArticleRepository(db, families);
         this.clients = new ClientRepository(db);
         this.tickets = new TicketRepository(db);
         this.invoiceLines = new InvoiceLineRepository(db);
         this.reports = new SalesReportRepository(db);
+    }
+
+    /**
+     * Retorna el repositori de famílies.
+     *
+     * @return repositori de famílies
+     */
+    public ArticleFamilyRepository families() {
+        return families;
     }
 
     /**

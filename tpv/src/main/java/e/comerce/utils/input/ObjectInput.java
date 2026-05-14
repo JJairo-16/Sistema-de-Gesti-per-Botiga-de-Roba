@@ -1,39 +1,42 @@
 package e.comerce.utils.input;
 
+import java.sql.SQLException;
+import java.text.Normalizer;
+import java.util.ArrayList;
 import java.util.List;
 
+import e.comerce.models.ArticleFamily;
 import e.comerce.models.Client;
 import e.comerce.models.articles.Article;
+import e.comerce.models.articles.GenericArticle;
 import e.comerce.models.articles.Pants;
 import e.comerce.models.articles.Shirt;
+import e.comerce.services.database.repository.ArticleFamilyRepository;
 import e.comerce.utils.rules.RulesChecker;
 import e.comerce.utils.rules.RulesChecker.CheckResult;
 import e.comerce.utils.ui.Prettier;
 
-/**
- * Crea objectes demanant dades per consola.
- */
+/** Crea objectes demanant dades per consola. */
 public final class ObjectInput {
-    private static final Getters GETTERS = new Getters();
+    private final Getters getters;
+    private final ArticleFamilyRepository familyRepository;
 
-    private static final List<String> ARTICLE_TYPES = List.of(
-            "Camisa",
-            "Pantalons",
-            "Cancel·lar");
-
-    private static final int SHIRT_OPTION = 1;
-    private static final int PANTS_OPTION = 2;
-    private static final int CANCEL_OPTION = 3;
-
-    private ObjectInput() {
+    /**
+     * Crea un lector d'objectes.
+     *
+     * @param familyRepository repositori de famílies
+     */
+    public ObjectInput(ArticleFamilyRepository familyRepository) {
+        this.getters = new Getters();
+        this.familyRepository = familyRepository;
     }
 
     /**
      * Demana les dades d'un client.
      *
-     * @return client creat o null si es cancel·la
+     * @return client creat o {@code null} si es cancel·la
      */
-    public static Client askClient() {
+    public Client askClient() {
         showCancelHint();
 
         String dni = askValidatedString("DNI: ", "DNI", RulesChecker::checkDni);
@@ -62,37 +65,58 @@ public final class ObjectInput {
     /**
      * Demana el tipus i les dades d'un article.
      *
-     * @return article creat o null si es cancel·la
+     * @return article creat o {@code null} si es cancel·la
+     * @throws SQLException si falla la consulta de famílies
      */
-    public static Article askArticle() {
-        int option = Menu.getOption(ARTICLE_TYPES, "Tipus d'article");
+    public Article askArticle() throws SQLException {
+        List<ArticleFamily> families = familyRepository.findAll();
 
-        return switch (option) {
-            case SHIRT_OPTION -> askShirt();
-            case PANTS_OPTION -> askPants();
-            case CANCEL_OPTION -> {
-                cancel();
-                yield null;
-            }
-            default -> {
-                invalidOption();
-                yield null;
-            }
-        };
+        if (families.isEmpty()) {
+            Prettier.warn("No hi ha famílies d'articles a la base de dades.");
+            return null;
+        }
+
+        List<String> options = new ArrayList<>();
+
+        for (ArticleFamily family : families) {
+            options.add(family.name());
+        }
+
+        options.add("Cancel·lar");
+
+        int option = Menu.getOption(options, "Tipus d'article");
+
+        if (option == options.size()) {
+            cancel();
+            return null;
+        }
+
+        if (option < 1 || option > families.size()) {
+            invalidOption();
+            return null;
+        }
+
+        String family = families.get(option - 1).name();
+
+        if (isShirt(family)) {
+            return askShirt(family);
+        }
+
+        if (isPants(family)) {
+            return askPants();
+        }
+
+        return askGenericArticle(family);
     }
 
     /**
      * Demana les dades d'una camisa.
      *
-     * @return camisa creada o null si es cancel·la
+     * @param family família de l'article
+     * @return camisa creada o {@code null} si es cancel·la
      */
-    public static Shirt askShirt() {
+    public Shirt askShirt(String family) {
         showCancelHint();
-
-        Integer id = askValidatedInteger("Identificador: ", "Identificador", RulesChecker::checkArticleId);
-        if (id == null) {
-            return null;
-        }
 
         String name = askValidatedString("Nom de l'article: ", "Nom de l'article", RulesChecker::checkArticleName);
         if (name == null) {
@@ -124,21 +148,16 @@ public final class ObjectInput {
             return null;
         }
 
-        return new Shirt(id, name, neckSize, chestWidth, basePrice, iva, stock);
+        return new Shirt(-1, name, family, neckSize, chestWidth, basePrice, iva, stock);
     }
 
     /**
      * Demana les dades d'uns pantalons.
      *
-     * @return pantalons creats o null si es cancel·la
+     * @return pantalons creats o {@code null} si es cancel·la
      */
-    public static Pants askPants() {
+    public Pants askPants() {
         showCancelHint();
-
-        Integer id = askValidatedInteger("Identificador: ", "Identificador", RulesChecker::checkArticleId);
-        if (id == null) {
-            return null;
-        }
 
         String name = askValidatedString("Nom de l'article: ", "Nom de l'article", RulesChecker::checkArticleName);
         if (name == null) {
@@ -173,20 +192,52 @@ public final class ObjectInput {
             return null;
         }
 
-        return new Pants(id, name, pantsLength, waistSize, basePrice, iva, stock);
+        return new Pants(-1, name, pantsLength, waistSize, basePrice, iva, stock);
     }
 
     /**
-     * Demana un text i aplica una validació.
+     * Demana les dades d'un article genèric.
      *
-     * @param prompt    missatge d'entrada
-     * @param name      nom del camp
-     * @param validator validador
-     * @return text normalitzat o null si es cancel·la
+     * @param family família de l'article
+     * @return article creat o {@code null} si es cancel·la
      */
-    private static String askValidatedString(String prompt, String name, StringValidator validator) {
+    public GenericArticle askGenericArticle(String family) {
+        showCancelHint();
+
+        String name = askValidatedString("Nom de l'article: ", "Nom de l'article", RulesChecker::checkArticleName);
+        if (name == null) {
+            return null;
+        }
+
+        Double basePrice = askValidatedDouble("Preu base: ", "Preu base", RulesChecker::checkBasePrice);
+        if (basePrice == null) {
+            return null;
+        }
+
+        Integer iva = askValidatedInteger("IVA: ", "IVA", RulesChecker::checkIva);
+        if (iva == null) {
+            return null;
+        }
+
+        Integer stock = askValidatedInteger("Stock: ", "Stock", RulesChecker::checkStock);
+        if (stock == null) {
+            return null;
+        }
+
+        return new GenericArticle(-1, name, family, basePrice, iva, stock);
+    }
+
+    /**
+     * Demana un text validat.
+     *
+     * @param prompt missatge d'entrada
+     * @param name nom del camp
+     * @param validator validador
+     * @return text normalitzat o {@code null} si es cancel·la
+     */
+    private String askValidatedString(String prompt, String name, StringValidator validator) {
         while (true) {
-            String value = GETTERS.getStringAllowEmpty(prompt, name);
+            String value = getters.getStringAllowEmpty(prompt, name);
 
             if (value.isEmpty()) {
                 cancel();
@@ -204,16 +255,16 @@ public final class ObjectInput {
     }
 
     /**
-     * Demana un enter i aplica una validació.
+     * Demana un enter validat.
      *
-     * @param prompt    missatge d'entrada
-     * @param name      nom del camp
+     * @param prompt missatge d'entrada
+     * @param name nom del camp
      * @param validator validador
-     * @return enter validat o null si es cancel·la
+     * @return enter validat o {@code null} si es cancel·la
      */
-    private static Integer askValidatedInteger(String prompt, String name, IntegerValidator validator) {
+    private Integer askValidatedInteger(String prompt, String name, IntegerValidator validator) {
         while (true) {
-            String input = GETTERS.getStringAllowEmpty(prompt, name);
+            String input = getters.getStringAllowEmpty(prompt, name);
 
             if (input.isEmpty()) {
                 cancel();
@@ -236,16 +287,16 @@ public final class ObjectInput {
     }
 
     /**
-     * Demana un decimal i aplica una validació.
+     * Demana un decimal validat.
      *
-     * @param prompt    missatge d'entrada
-     * @param name      nom del camp
+     * @param prompt missatge d'entrada
+     * @param name nom del camp
      * @param validator validador
-     * @return decimal validat o null si es cancel·la
+     * @return decimal validat o {@code null} si es cancel·la
      */
-    private static Double askValidatedDouble(String prompt, String name, DoubleValidator validator) {
+    private Double askValidatedDouble(String prompt, String name, DoubleValidator validator) {
         while (true) {
-            String input = GETTERS.getStringAllowEmpty(prompt, name).replace(',', '.');
+            String input = getters.getStringAllowEmpty(prompt, name).replace(',', '.');
 
             if (input.isEmpty()) {
                 cancel();
@@ -268,45 +319,72 @@ public final class ObjectInput {
     }
 
     /**
-     * Mostra com cancel·lar l'operació.
+     * Comprova si una família és de camises.
+     *
+     * @param family família a comprovar
+     * @return {@code true} si és camisa
      */
+    private static boolean isShirt(String family) {
+        return normalize(family).equals("camisa");
+    }
+
+    /**
+     * Comprova si una família és de pantalons.
+     *
+     * @param family família a comprovar
+     * @return {@code true} si és pantalons
+     */
+    private static boolean isPants(String family) {
+        String normalizedFamily = normalize(family);
+        return normalizedFamily.equals("pantalo")
+                || normalizedFamily.equals("pantalons")
+                || normalizedFamily.equals("pantalon")
+                || normalizedFamily.equals("pantalones");
+    }
+
+    /**
+     * Normalitza un text per comparar-lo.
+     *
+     * @param value text original
+     * @return text normalitzat
+     */
+    private static String normalize(String value) {
+        if (value == null) {
+            return "";
+        }
+
+        return Normalizer.normalize(value.trim().toLowerCase(), Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "");
+    }
+
+    /** Mostra com cancel·lar l'operació. */
     private static void showCancelHint() {
         Prettier.info("Prem Enter sense escriure res per cancel·lar.");
     }
 
-    /**
-     * Informa de la cancel·lació.
-     */
+    /** Informa de la cancel·lació. */
     private static void cancel() {
         Prettier.info("Operació cancel·lada.");
     }
 
-    /**
-     * Informa d'una opció no vàlida.
-     */
+    /** Informa d'una opció no vàlida. */
     private static void invalidOption() {
         Prettier.warn("Opció no vàlida.");
     }
 
-    /**
-     * Valida textos.
-     */
+    /** Valida textos. */
     @FunctionalInterface
     private interface StringValidator {
         CheckResult validate(String value);
     }
 
-    /**
-     * Valida enters.
-     */
+    /** Valida enters. */
     @FunctionalInterface
     private interface IntegerValidator {
         CheckResult validate(int value);
     }
 
-    /**
-     * Valida decimals.
-     */
+    /** Valida decimals. */
     @FunctionalInterface
     private interface DoubleValidator {
         CheckResult validate(double value);

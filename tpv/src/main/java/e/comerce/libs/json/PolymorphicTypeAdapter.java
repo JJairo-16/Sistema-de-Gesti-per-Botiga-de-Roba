@@ -147,6 +147,10 @@ final class PolymorphicTypeAdapter<T>
         String typeField = registry.typeField();
 
         if (!jsonObject.has(typeField)) {
+            if (registry.hasDefaultSubtype()) {
+                return null;
+            }
+
             throw new JsonParseException(
                     "Falta el camp de tipus: " + typeField
             );

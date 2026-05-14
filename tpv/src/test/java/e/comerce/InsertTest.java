@@ -18,7 +18,7 @@ import e.comerce.libs.db.Pool;
 import e.comerce.models.Client;
 import e.comerce.services.database.repository.ClientRepository;
 
-public class InsertTest {
+class InsertTest {
 
         private static Pool pool;
         private static Database db;

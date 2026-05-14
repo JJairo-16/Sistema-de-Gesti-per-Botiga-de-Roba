@@ -146,10 +146,13 @@ public final class MainManager {
         } catch (IOException e) {
             Prettier.error(
                     "Error al llegir el fitxer. Si us plau, comprova que el fitxer existeix i que el format és correcte.");
+                    e.printStackTrace();
         } catch (SQLException e) {
             Prettier.error("Error en la base de dades. Si us plau, torni a intentar-ho més tard.");
+            e.printStackTrace();
         } catch (Exception e) {
             Prettier.error("Error inesperat. Si us plau, torni a intentar-ho més tard.");
+            e.printStackTrace();
         }
     }
 

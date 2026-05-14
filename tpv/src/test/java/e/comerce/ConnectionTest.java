@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import e.comerce.libs.db.Pool;
 
-public class conexionTest {
+class ConnectionTest {
 
     private static Pool pool;
 

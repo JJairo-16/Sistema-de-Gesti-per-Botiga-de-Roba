@@ -11,6 +11,7 @@ import e.comerce.libs.db.table.TableLock;
 import e.comerce.libs.json.PolymorphicJsonLoader;
 import e.comerce.models.articles.Article;
 import e.comerce.models.articles.ArticleType;
+import e.comerce.models.articles.GenericArticle;
 import e.comerce.models.articles.Pants;
 import e.comerce.models.articles.Shirt;
 import e.comerce.services.database.ShopDatabase;
@@ -33,12 +34,14 @@ public final class DatabaseRestocker {
     private static final Path RESTOCK_PATH = Path.of("tpv/data/articles.json");
 
     private static final List<TableLock> RESTOCK_TABLE_LOCKS = List.of(
-            TableLock.write("articles"));
-
+            TableLock.write("articles"),
+            TableLock.read("familias"));
+            
     private static final PolymorphicJsonLoader<Article> loader = PolymorphicJsonLoader.forBaseType(Article.class)
             .typeField("familia")
-            .subtype(ArticleType.SHIRT.type(), Shirt.class)
-            .subtype(ArticleType.PANTS.type(), Pants.class)
+            .subtypePattern("camisas?", ArticleType.SHIRT.type(), Shirt.class)
+            .subtypePattern("pantal[oó](n|ns|nes)?", ArticleType.PANTS.type(), Pants.class)
+            .defaultSubtype(ArticleType.GENERIC.type(), GenericArticle.class)
             .build();
 
     /**
@@ -88,11 +91,11 @@ public final class DatabaseRestocker {
      * del JSON. Si no existeix, es dona d'alta.
      * </p>
      *
-     * @param db base de dades de la botiga
+     * @param db      base de dades de la botiga
      * @param preview articles preparats prèviament
      * @return resum final del reaprovisionament
      * @throws SQLException si la base de dades retorna un error o si no es pot
-     * obtenir el bloqueig dins del temps configurat
+     *                      obtenir el bloqueig dins del temps configurat
      */
     public static RestockResult commit(ShopDatabase db, RestockPreview preview) throws SQLException {
         Objects.requireNonNull(db, "La base de dades no pot ser nul·la");
@@ -105,12 +108,12 @@ public final class DatabaseRestocker {
      * Desa a la base de dades els articles prèviament preparats fent servir un
      * timeout concret per obtenir el bloqueig de taula.
      *
-     * @param db base de dades de la botiga
-     * @param preview articles preparats prèviament
+     * @param db             base de dades de la botiga
+     * @param preview        articles preparats prèviament
      * @param timeoutSeconds segons màxims d'espera per obtenir el bloqueig
      * @return resum final del reaprovisionament
      * @throws SQLException si la base de dades retorna un error o si no es pot
-     * obtenir el bloqueig dins del temps indicat
+     *                      obtenir el bloqueig dins del temps indicat
      */
     public static RestockResult commit(
             ShopDatabase db,
@@ -140,9 +143,9 @@ public final class DatabaseRestocker {
      *
      * @param db base de dades de la botiga
      * @return resum final del reaprovisionament
-     * @throws IOException si no es pot llegir el JSON
+     * @throws IOException  si no es pot llegir el JSON
      * @throws SQLException si la base de dades retorna un error o si no es pot
-     * obtenir el bloqueig dins del temps configurat
+     *                      obtenir el bloqueig dins del temps configurat
      */
     public static RestockResult restock(ShopDatabase db) throws IOException, SQLException {
         RestockPreview preview = preview();
@@ -158,12 +161,12 @@ public final class DatabaseRestocker {
      * Carrega el JSON per defecte i el desa directament a la base de dades fent
      * servir un timeout concret per obtenir el bloqueig de taula.
      *
-     * @param db base de dades de la botiga
+     * @param db             base de dades de la botiga
      * @param timeoutSeconds segons màxims d'espera per obtenir el bloqueig
      * @return resum final del reaprovisionament
-     * @throws IOException si no es pot llegir el JSON
+     * @throws IOException  si no es pot llegir el JSON
      * @throws SQLException si la base de dades retorna un error o si no es pot
-     * obtenir el bloqueig dins del temps indicat
+     *                      obtenir el bloqueig dins del temps indicat
      */
     public static RestockResult restock(ShopDatabase db, int timeoutSeconds) throws IOException, SQLException {
         RestockPreview preview = preview();
@@ -230,9 +233,9 @@ public final class DatabaseRestocker {
      * Dades carregades del JSON abans de modificar la base de dades.
      *
      * @param articles articles carregats
-     * @param total nombre total d'articles
-     * @param shirts nombre de camises
-     * @param pants nombre de pantalons
+     * @param total    nombre total d'articles
+     * @param shirts   nombre de camises
+     * @param pants    nombre de pantalons
      */
     public record RestockPreview(List<Article> articles, int total, int shirts, int pants) {
         public RestockPreview {
@@ -243,11 +246,11 @@ public final class DatabaseRestocker {
     /**
      * Resum final del procés d'importació d'articles.
      *
-     * @param total nombre total d'articles llegits
-     * @param shirts nombre de camises llegides
-     * @param pants nombre de pantalons llegits
+     * @param total    nombre total d'articles llegits
+     * @param shirts   nombre de camises llegides
+     * @param pants    nombre de pantalons llegits
      * @param inserted articles afegits
-     * @param updated articles actualitzats
+     * @param updated  articles actualitzats
      */
     public record RestockResult(int total, int shirts, int pants, int inserted, int updated) {
     }

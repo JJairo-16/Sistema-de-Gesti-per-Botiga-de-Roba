@@ -26,6 +26,7 @@ public final class ArticlesManager {
     private static final int EXIT_OPTION = ARTICLE_OPTIONS.size();
 
     private final ArticleRepository repo;
+    private final ObjectInput input;
     private final ArticleSelector selector;
     private final Cleaner cleaner;
 
@@ -37,6 +38,7 @@ public final class ArticlesManager {
      */
     public ArticlesManager(ShopDatabase shop, Cleaner cleaner) {
         this.repo = shop.articles();
+        this.input = new ObjectInput(shop.families());
         this.selector = new ArticleSelector(shop);
         this.cleaner = cleaner;
     }
@@ -99,7 +101,7 @@ public final class ArticlesManager {
     private void registerArticle() {
         Prettier.info("Si us plau, ompli les dades del nou article:");
 
-        Article article = ObjectInput.askArticle();
+        Article article = askArticle();
 
         if (article == null) {
             return;
@@ -119,11 +121,11 @@ public final class ArticlesManager {
                 Prettier.warn("No s'ha pogut afegir l'article.");
             }
         } catch (SQLException e) {
-            databaseError();
+            databaseError(e);
         } catch (IllegalArgumentException e) {
             Prettier.warn(e.getMessage());
         } catch (Exception e) {
-            unexpectedError();
+            unexpectedError(e);
         }
     }
 
@@ -146,11 +148,11 @@ public final class ArticlesManager {
                 Prettier.warn("No s'ha trobat l'article a la base de dades.");
             }
         } catch (SQLException e) {
-            databaseError();
+            databaseError(e);
         } catch (IllegalArgumentException e) {
             Prettier.warn(e.getMessage());
         } catch (Exception e) {
-            unexpectedError();
+            unexpectedError(e);
         }
     }
 
@@ -167,7 +169,7 @@ public final class ArticlesManager {
         Prettier.info("Introdueix les noves dades de l'article.");
         Prettier.info("L'ID s'ha de mantenir igual: %d", oldArticle.getId());
 
-        Article newArticle = ObjectInput.askArticle();
+        Article newArticle = askArticle();
 
         if (newArticle == null) {
             return;
@@ -187,11 +189,11 @@ public final class ArticlesManager {
                 Prettier.warn("No s'ha pogut modificar l'article.");
             }
         } catch (SQLException e) {
-            databaseError();
+            databaseError(e);
         } catch (IllegalArgumentException e) {
             Prettier.warn(e.getMessage());
         } catch (Exception e) {
-            unexpectedError();
+            unexpectedError(e);
         }
     }
 
@@ -228,17 +230,30 @@ public final class ArticlesManager {
                 article.getProfitPerUnit());
     }
 
+    private Article askArticle() {
+        Article article;
+        try {
+            article = input.askArticle();
+        } catch (SQLException e) {
+            return null;
+        }
+
+        return article;
+    }
+
     /**
      * Informa d'un error de base de dades.
      */
-    private void databaseError() {
+    private void databaseError(Exception e) {
         Prettier.error("Error en la base de dades. Si us plau, torni a intentar-ho més tard.");
+        e.printStackTrace();
     }
 
     /**
      * Informa d'un error inesperat.
      */
-    private void unexpectedError() {
+    private void unexpectedError(Exception e) {
         Prettier.error("Error inesperat. Si us plau, torni a intentar-ho més tard.");
+        e.printStackTrace();
     }
 }

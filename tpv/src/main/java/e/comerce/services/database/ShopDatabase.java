@@ -11,6 +11,7 @@ import e.comerce.libs.db.Database;
 import e.comerce.libs.db.Pool;
 import e.comerce.libs.db.table.TableLock;
 import e.comerce.services.database.report.SalesReportRepository;
+import e.comerce.services.database.repository.ArticleFamilyRepository;
 import e.comerce.services.database.repository.ArticleRepository;
 import e.comerce.services.database.repository.ClientRepository;
 import e.comerce.services.database.repository.InvoiceLineRepository;
@@ -37,6 +38,7 @@ public class ShopDatabase implements AutoCloseable {
     private final Pool pool;
     private final Database database;
 
+    private final ArticleFamilyRepository families;
     private final ArticleRepository articles;
     private final ClientRepository clients;
     private final TicketRepository tickets;
@@ -71,7 +73,8 @@ public class ShopDatabase implements AutoCloseable {
 
         this.database = new Database(pool);
 
-        this.articles = new ArticleRepository(database);
+        this.families = new ArticleFamilyRepository(database);
+        this.articles = new ArticleRepository(database, families);
         this.clients = new ClientRepository(database);
         this.tickets = new TicketRepository(database);
         this.invoiceLines = new InvoiceLineRepository(database);
@@ -87,7 +90,7 @@ public class ShopDatabase implements AutoCloseable {
      * </p>
      *
      * @param work treball a executar dins de la transacció
-     * @param <T> tipus de valor retornat
+     * @param <T>  tipus de valor retornat
      * @return valor retornat pel treball
      * @throws SQLException si la base de dades retorna un error
      */
@@ -104,8 +107,8 @@ public class ShopDatabase implements AutoCloseable {
      * Executa una transacció de botiga amb un nivell d'aïllament concret.
      *
      * @param isolationLevel nivell d'aïllament de {@link java.sql.Connection}
-     * @param work treball a executar dins de la transacció
-     * @param <T> tipus de valor retornat
+     * @param work           treball a executar dins de la transacció
+     * @param <T>            tipus de valor retornat
      * @return valor retornat pel treball
      * @throws SQLException si la base de dades retorna un error
      */
@@ -124,10 +127,10 @@ public class ShopDatabase implements AutoCloseable {
      * timeout i no s'executa el treball.
      * </p>
      *
-     * @param locks taules que cal bloquejar
+     * @param locks          taules que cal bloquejar
      * @param timeoutSeconds segons màxims d'espera
-     * @param work treball a executar amb les taules bloquejades
-     * @param <T> tipus de valor retornat
+     * @param work           treball a executar amb les taules bloquejades
+     * @param <T>            tipus de valor retornat
      * @return valor retornat pel treball
      * @throws SQLException si la base de dades retorna un error
      */
@@ -144,16 +147,26 @@ public class ShopDatabase implements AutoCloseable {
     }
 
     /**
-     * Executa una transacció protegida amb bloquejos de taula i el timeout per defecte.
+     * Executa una transacció protegida amb bloquejos de taula i el timeout per
+     * defecte.
      *
      * @param locks taules que cal bloquejar
-     * @param work treball a executar amb les taules bloquejades
-     * @param <T> tipus de valor retornat
+     * @param work  treball a executar amb les taules bloquejades
+     * @param <T>   tipus de valor retornat
      * @return valor retornat pel treball
      * @throws SQLException si la base de dades retorna un error
      */
     public <T> T transactionWithTableLocks(List<TableLock> locks, ShopWork<T> work) throws SQLException {
         return transactionWithTableLocks(locks, DEFAULT_LOCK_TIMEOUT_SECONDS, work);
+    }
+
+    /**
+     * Retorna el repositori de famílies.
+     *
+     * @return repositori de famílies
+     */
+    public ArticleFamilyRepository families() {
+        return families;
     }
 
     /**

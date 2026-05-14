@@ -1,5 +1,8 @@
 package e.comerce.models.articles;
 
+import java.text.Normalizer;
+import java.util.regex.Pattern;
+
 /**
  * Tipus d'articles disponibles.
  */
@@ -8,7 +11,10 @@ public enum ArticleType {
     SHIRT("camisa"),
 
     /** Pantaló. */
-    PANTS("pantaló");
+    PANTS("pantaló"),
+
+    /** Article genèric. */
+    GENERIC("gèneric");
 
     private final String type;
 
@@ -35,19 +41,35 @@ public enum ArticleType {
      *
      * @param type nom del tipus
      * @return tipus d'article corresponent
-     * @throws IllegalArgumentException si el tipus no existeix
      */
     public static ArticleType getType(String type) {
-        if (type == null || type.isBlank()) {
-            throw new IllegalArgumentException("El tipus d'article no pot estar buit");
+        String normalizedType = normalize(type);
+
+        if (normalizedType.isBlank()) {
+            return GENERIC;
         }
 
-        for (ArticleType articleType : ArticleType.values()) {
-            if (articleType.type().equals(type)) {
-                return articleType;
-            }
+        if (normalizedType.matches("camisas?")) {
+            return SHIRT;
         }
 
-        throw new IllegalArgumentException("El tipus d'article no existeix");
+        if (normalizedType.matches("pantal(o|on|ons|ones)")) {
+            return PANTS;
+        }
+
+        return GENERIC;
+    }
+
+    private static final Pattern DIACRITICS_PATTERN = Pattern.compile("\\p{M}+");
+
+    private static String normalize(String value) {
+        if (value == null) {
+            return "";
+        }
+
+        return DIACRITICS_PATTERN
+                .matcher(Normalizer.normalize(value.trim().toLowerCase(), Normalizer.Form.NFD))
+                .replaceAll("");
+
     }
 }

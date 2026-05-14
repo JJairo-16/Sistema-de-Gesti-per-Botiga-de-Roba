@@ -16,6 +16,7 @@ import java.util.Objects;
  *         .typeField("type")
  *         .subtype("dog", Dog.class)
  *         .subtype("cat", Cat.class)
+ *         .defaultSubtype("generic", GenericAnimal.class)
  *         .build();
  * </pre>
  *
@@ -33,11 +34,6 @@ public final class PolymorphicJsonLoaderBuilder<T> {
     /**
      * Crea un nou constructor per a un tipus base.
      *
-     * <p>
-     * El tipus base representa la classe, interfície o classe abstracta
-     * sobre la qual es definiran els subtipus.
-     * </p>
-     *
      * @param baseType tipus base del loader
      */
     PolymorphicJsonLoaderBuilder(Class<T> baseType) {
@@ -47,15 +43,6 @@ public final class PolymorphicJsonLoaderBuilder<T> {
 
     /**
      * Defineix el nom del camp discriminador.
-     *
-     * <p>
-     * Aquest camp s'utilitza per identificar quin subtipus s'ha de crear
-     * durant la deserialització.
-     * </p>
-     *
-     * <pre>
-     * .typeField("type")
-     * </pre>
      *
      * @param typeField nom del camp discriminador
      * @return el mateix constructor per continuar la configuració
@@ -69,12 +56,13 @@ public final class PolymorphicJsonLoaderBuilder<T> {
      * Registra un subtipus amb el seu identificador.
      *
      * <p>
-     * El valor {@code typeName} és el que apareixerà al JSON per indicar
-     * quin tipus concret s'ha d'utilitzar.
+     * El nom registrat accepta coincidència exacta i també coincidència
+     * normalitzada. Per exemple, si es registra {@code Camisa}, també podrà
+     * llegir {@code camisa}, {@code CAMISA} o {@code camisas}.
      * </p>
      *
      * <pre>
-     * .subtype("dog", Dog.class)
+     * .subtype("Camisa", Shirt.class)
      * </pre>
      *
      * @param typeName identificador del tipus al JSON
@@ -90,16 +78,59 @@ public final class PolymorphicJsonLoaderBuilder<T> {
     }
 
     /**
-     * Activa o desactiva el format llegible del JSON.
+     * Registra un subtipus amb una expressió regular.
      *
      * <p>
-     * Quan està activat, el JSON es genera amb indentació per facilitar-ne
-     * la lectura.
+     * El patró es compara amb {@code matches()}, per tant ha de coincidir amb
+     * tot el valor del camp discriminador. La comparació ignora majúscules i
+     * minúscules.
      * </p>
      *
      * <pre>
-     * .prettyPrinting(true)
+     * .subtypePattern("camisas?", "Camisa", Shirt.class)
+     * .subtypePattern("pantalon(es)?|pantalons", "Pantalons", Pants.class)
      * </pre>
+     *
+     * @param typePattern expressió regular que reconeix el valor del JSON
+     * @param serializedTypeName nom canònic que s'escriurà en serialitzar
+     * @param subtype classe concreta del subtipus
+     * @return el mateix constructor per continuar la configuració
+     */
+    public PolymorphicJsonLoaderBuilder<T> subtypePattern(
+            String typePattern,
+            String serializedTypeName,
+            Class<? extends T> subtype
+    ) {
+        registry.registerPattern(typePattern, serializedTypeName, subtype);
+        return this;
+    }
+
+    /**
+     * Registra el subtipus per defecte.
+     *
+     * <p>
+     * Aquest subtipus s'utilitza quan el valor del camp discriminador no
+     * coincideix amb cap subtipus registrat prèviament.
+     * </p>
+     *
+     * <pre>
+     * .defaultSubtype("Generic", GenericArticle.class)
+     * </pre>
+     *
+     * @param serializedTypeName nom que s'escriurà en serialitzar aquest subtipus
+     * @param subtype classe concreta per defecte
+     * @return el mateix constructor per continuar la configuració
+     */
+    public PolymorphicJsonLoaderBuilder<T> defaultSubtype(
+            String serializedTypeName,
+            Class<? extends T> subtype
+    ) {
+        registry.registerDefault(serializedTypeName, subtype);
+        return this;
+    }
+
+    /**
+     * Activa o desactiva el format llegible del JSON.
      *
      * @param enabled {@code true} per activar el format llegible
      * @return el mateix constructor per continuar la configuració
@@ -111,15 +142,6 @@ public final class PolymorphicJsonLoaderBuilder<T> {
 
     /**
      * Construeix una instància de {@link PolymorphicJsonLoader}.
-     *
-     * <p>
-     * Valida que s'hagin registrat correctament els subtipus abans de crear
-     * el loader final.
-     * </p>
-     *
-     * <pre>
-     * PolymorphicJsonLoader&lt;Animal&gt; loader = builder.build();
-     * </pre>
      *
      * @return una instància configurada de {@code PolymorphicJsonLoader}
      */

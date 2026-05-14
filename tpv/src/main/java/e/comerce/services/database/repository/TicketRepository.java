@@ -15,10 +15,22 @@ public class TicketRepository {
 
     private final DbExecutor db;
 
+    /**
+     * Crea un repositori de tiquets.
+     *
+     * @param db executor de base de dades
+     */
     public TicketRepository(DbExecutor db) {
         this.db = Objects.requireNonNull(db, "La base de dades no pot ser nul·la");
     }
 
+    /**
+     * Insereix un tiquet.
+     *
+     * @param ticket tiquet a inserir
+     * @return id generat
+     * @throws SQLException si falla l'operació
+     */
     public long insert(Ticket ticket) throws SQLException {
         Objects.requireNonNull(ticket, "El tiquet no pot ser nul");
 
@@ -32,6 +44,13 @@ public class TicketRepository {
                 ticket.totalFinal());
     }
 
+    /**
+     * Actualitza un tiquet.
+     *
+     * @param ticket tiquet amb les dades noves
+     * @return {@code true} si s'ha actualitzat
+     * @throws SQLException si falla l'operació
+     */
     public boolean update(Ticket ticket) throws SQLException {
         Objects.requireNonNull(ticket, "El tiquet no pot ser nul");
         validateId(ticket.id());
@@ -47,11 +66,25 @@ public class TicketRepository {
                 ticket.id()) > 0;
     }
 
+    /**
+     * Elimina un tiquet pel seu id.
+     *
+     * @param id identificador del tiquet
+     * @return {@code true} si s'ha eliminat
+     * @throws SQLException si falla l'operació
+     */
     public boolean delete(int id) throws SQLException {
         validateId(id);
         return db.delete("DELETE FROM tiquets WHERE id = ?", id) > 0;
     }
 
+    /**
+     * Cerca un tiquet pel seu id.
+     *
+     * @param id identificador del tiquet
+     * @return tiquet trobat o {@code null}
+     * @throws SQLException si falla la consulta
+     */
     public Ticket findById(int id) throws SQLException {
         validateId(id);
         return db.one(
@@ -66,6 +99,13 @@ public class TicketRepository {
                         rs.getDouble("total_final")));
     }
 
+    /**
+     * Cerca els tiquets d'un client.
+     *
+     * @param dniClient DNI del client
+     * @return tiquets del client
+     * @throws SQLException si falla la consulta
+     */
     public List<Ticket> findByClient(String dniClient) throws SQLException {
         if (dniClient == null || dniClient.isBlank()) {
             throw new IllegalArgumentException("El DNI del client no pot estar buit");
@@ -84,14 +124,31 @@ public class TicketRepository {
                         rs.getDouble("total_final")));
     }
 
+    /**
+     * Converteix una data de l'aplicació a SQL.
+     *
+     * @param appDate data en format de l'aplicació
+     * @return data SQL
+     */
     private static java.sql.Date toSqlDate(String appDate) {
         return java.sql.Date.valueOf(LocalDate.parse(appDate, APP_FORMAT));
     }
 
+    /**
+     * Converteix una data SQL a text de l'aplicació.
+     *
+     * @param date data SQL
+     * @return data en format de l'aplicació
+     */
     private static String fromSqlDate(LocalDate date) {
         return APP_FORMAT.format(date);
     }
 
+    /**
+     * Valida que un id sigui positiu.
+     *
+     * @param id identificador a validar
+     */
     private static void validateId(int id) {
         if (id <= 0) {
             throw new IllegalArgumentException("L'id del tiquet ha de ser positiu");
