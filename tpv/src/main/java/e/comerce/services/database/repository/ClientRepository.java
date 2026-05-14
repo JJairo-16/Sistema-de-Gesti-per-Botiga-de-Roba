@@ -4,14 +4,14 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
-import e.comerce.libs.db.Database;
+import e.comerce.libs.db.DbExecutor;
 import e.comerce.models.Client;
 
 /** Gestiona totes les operacions de base de dades relacionades amb clients. */
 public class ClientRepository {
-    private final Database db;
+    private final DbExecutor db;
 
-    public ClientRepository(Database db) {
+    public ClientRepository(DbExecutor db) {
         this.db = Objects.requireNonNull(db, "La base de dades no pot ser nul·la");
     }
 
@@ -70,6 +70,33 @@ public class ClientRepository {
     public List<Client> findAll() throws SQLException {
         return db.list(
                 "SELECT dni, nom, email, telefon FROM clients ORDER BY dni",
+                rs -> new Client(
+                        rs.getString("dni"),
+                        rs.getString("nom"),
+                        rs.getString("email"),
+                        rs.getString("telefon")));
+    }
+
+    /**
+     * Cerca clients per DNI, nom, correu o telèfon.
+     *
+     * @param query text de cerca
+     * @return clients trobats
+     * @throws SQLException si la base de dades retorna un error
+     */
+    public List<Client> search(String query) throws SQLException {
+        if (query == null || query.isBlank()) {
+            return List.of();
+        }
+
+        String pattern = "%" + query.trim().toLowerCase() + "%";
+
+        return db.list(
+                "SELECT dni, nom, email, telefon FROM clients "
+                        + "WHERE LOWER(dni) LIKE ? OR LOWER(nom) LIKE ? "
+                        + "OR LOWER(email) LIKE ? OR LOWER(telefon) LIKE ? "
+                        + "ORDER BY nom, dni",
+                new Object[] { pattern, pattern, pattern, pattern },
                 rs -> new Client(
                         rs.getString("dni"),
                         rs.getString("nom"),

@@ -1,7 +1,9 @@
-package e.comerce.libs.db;
+package e.comerce.libs.db.functional;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import e.comerce.libs.db.Database;
 
 /**
  * Interfície funcional per convertir una fila d'un {@link ResultSet}

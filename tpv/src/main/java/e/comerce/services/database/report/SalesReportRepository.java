@@ -4,13 +4,13 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
-import e.comerce.libs.db.Database;
+import e.comerce.libs.db.DbExecutor;
 
 /** Consultes agregades de vendes i beneficis. */
 public class SalesReportRepository {
-    private final Database db;
+    private final DbExecutor db;
 
-    public SalesReportRepository(Database db) {
+    public SalesReportRepository(DbExecutor db) {
         this.db = Objects.requireNonNull(db, "La base de dades no pot ser nul·la");
     }
 

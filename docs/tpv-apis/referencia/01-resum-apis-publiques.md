@@ -1,3 +1,5 @@
+[Tornar a l'índex](../README.md)
+
 # Resum d'APIs públiques
 
 ## `models`
@@ -58,9 +60,18 @@ public double calculateTotalFinal(List<InvoiceLine> lines)
 public static RestockPreview preview() throws IOException
 public static RestockPreview preview(Path jsonPath) throws IOException
 public static RestockResult commit(ShopDatabase database, RestockPreview preview) throws SQLException
+public static RestockResult commit(ShopDatabase database, RestockPreview preview, int timeoutSeconds) throws SQLException
 public static RestockResult restock(ShopDatabase database) throws IOException, SQLException
+public static RestockResult restock(ShopDatabase database, int timeoutSeconds) throws IOException, SQLException
 public static void printPreview(RestockPreview preview)
 public static void printResult(RestockResult result)
+```
+
+### `services.sales.SaleService`
+
+```java
+public SaleService(ShopDatabase database)
+public long registerSale(Ticket ticket, List<InvoiceLine> lines) throws SQLException
 ```
 
 ## `services.database`
@@ -75,7 +86,28 @@ public ClientRepository clients()
 public TicketRepository tickets()
 public InvoiceLineRepository invoiceLines()
 public SalesReportRepository reports()
+public <T> T transaction(ShopWork<T> work) throws SQLException
+public void transaction(ShopRunnable work) throws SQLException
+public <T> T transactionWithTableLocks(List<TableLock> locks, ShopWork<T> work) throws SQLException
+public <T> T transactionWithTableLocks(List<TableLock> locks, int timeoutSeconds, ShopWork<T> work) throws SQLException
 public void close()
+```
+
+### `ShopTransaction`
+
+```java
+public ArticleRepository articles()
+public ClientRepository clients()
+public TicketRepository tickets()
+public InvoiceLineRepository invoiceLines()
+public SalesReportRepository reports()
+```
+
+### `TableLock`
+
+```java
+public static TableLock read(String table)
+public static TableLock write(String table)
 ```
 
 ### `services.database.repository.ArticleRepository`
@@ -86,6 +118,7 @@ public boolean update(Article article) throws SQLException
 public boolean save(Article article) throws SQLException
 public boolean delete(int id) throws SQLException
 public Article findById(int id) throws SQLException
+public Article findByIdForUpdate(int id) throws SQLException
 public List<Article> findAll() throws SQLException
 public List<Article> findByType(ArticleType type) throws SQLException
 public boolean exists(int id) throws SQLException
@@ -122,15 +155,6 @@ public List<Ticket> findByClient(String dniClient) throws SQLException
 public boolean insert(InvoiceLine line) throws SQLException
 public boolean deleteByTicket(int ticketId) throws SQLException
 public List<InvoiceLine> findByTicket(int ticketId) throws SQLException
-```
-
-## `services.sales`
-
-### `SaleService`
-
-```java
-public SaleService(ShopDatabase database)
-public long registerSale(Ticket ticket, List<InvoiceLine> lines) throws SQLException
 ```
 
 ## `services.database.report`

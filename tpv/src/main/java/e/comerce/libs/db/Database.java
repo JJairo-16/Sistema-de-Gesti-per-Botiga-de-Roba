@@ -3,8 +3,15 @@ package e.comerce.libs.db;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.sql.DataSource;
+
+import e.comerce.libs.db.functional.RowMapper;
+import e.comerce.libs.db.functional.SqlRunnable;
+import e.comerce.libs.db.functional.SqlWork;
+import e.comerce.libs.db.table.TableLock;
+import e.comerce.libs.db.table.TableLockTimeoutException;
 
 /**
  * Classe principal per treballar amb la base de dades de manera senzilla.
@@ -31,7 +38,7 @@ import javax.sql.DataSource;
  * tanca per defecte.
  * </p>
  */
-public class Database {
+public class Database implements DbExecutor {
 
     private final Pool pool;
 
@@ -109,6 +116,7 @@ public class Database {
      * @return objecte trobat o {@code null}
      * @throws SQLException si hi ha un error SQL
      */
+    @Override
     public <T> T one(String sql, RowMapper<T> mapper) throws SQLException {
         return one(sql, Params.none(), mapper);
     }
@@ -138,6 +146,7 @@ public class Database {
      * @return objecte trobat o {@code null}
      * @throws SQLException si hi ha un error SQL
      */
+    @Override
     public <T> T one(String sql, Object param, RowMapper<T> mapper) throws SQLException {
         return one(sql, Params.of(param), mapper);
     }
@@ -153,6 +162,7 @@ public class Database {
      * @return objecte trobat o {@code null}
      * @throws SQLException si hi ha un error SQL
      */
+    @Override
     public <T> T one(String sql, Object[] params, RowMapper<T> mapper) throws SQLException {
         return one(sql, Params.of(params), mapper);
     }
@@ -166,6 +176,7 @@ public class Database {
      * @return llista d'objectes trobats
      * @throws SQLException si hi ha un error SQL
      */
+    @Override
     public <T> List<T> list(String sql, RowMapper<T> mapper) throws SQLException {
         return list(sql, Params.none(), mapper);
     }
@@ -195,6 +206,7 @@ public class Database {
      * @return llista d'objectes trobats
      * @throws SQLException si hi ha un error SQL
      */
+    @Override
     public <T> List<T> list(String sql, Object param, RowMapper<T> mapper) throws SQLException {
         return list(sql, Params.of(param), mapper);
     }
@@ -210,6 +222,7 @@ public class Database {
      * @return llista d'objectes trobats
      * @throws SQLException si hi ha un error SQL
      */
+    @Override
     public <T> List<T> list(String sql, Object[] params, RowMapper<T> mapper) throws SQLException {
         return list(sql, Params.of(params), mapper);
     }
@@ -235,6 +248,7 @@ public class Database {
      * @return nombre de files afectades
      * @throws SQLException si hi ha un error SQL
      */
+    @Override
     public int update(String sql, Object... params) throws SQLException {
         return update(sql, Params.of(params));
     }
@@ -260,6 +274,7 @@ public class Database {
      * @return clau generada o {@code -1}
      * @throws SQLException si hi ha un error SQL
      */
+    @Override
     public long insert(String sql, Object... params) throws SQLException {
         return insert(sql, Params.of(params));
     }
@@ -285,6 +300,7 @@ public class Database {
      * @return nombre de files eliminades
      * @throws SQLException si hi ha un error SQL
      */
+    @Override
     public int delete(String sql, Object... params) throws SQLException {
         return delete(sql, Params.of(params));
     }
@@ -310,6 +326,7 @@ public class Database {
      * @return {@code true} si la consulta retorna alguna fila
      * @throws SQLException si hi ha un error SQL
      */
+    @Override
     public boolean exists(String sql, Object... params) throws SQLException {
         return exists(sql, Params.of(params));
     }
@@ -335,8 +352,267 @@ public class Database {
      * @return valor numèric de la primera columna, o {@code 0} si no hi ha resultat
      * @throws SQLException si hi ha un error SQL
      */
+    @Override
     public long count(String sql, Object... params) throws SQLException {
         return count(sql, Params.of(params));
+    }
+
+    /**
+     * Executa un conjunt d'operacions dins d'una transacció.
+     *
+     * <p>
+     * Totes les operacions reben el mateix context i, per tant, utilitzen la
+     * mateixa connexió. Si el treball acaba correctament es fa {@code commit};
+     * si es produeix una excepció es fa {@code rollback}.
+     * </p>
+     *
+     * @param work treball a executar dins de la transacció
+     * @param <T> tipus de valor retornat
+     * @return valor retornat pel treball
+     * @throws SQLException si hi ha un error SQL
+     */
+    public <T> T transaction(SqlWork<T> work) throws SQLException {
+        return transaction(Connection.TRANSACTION_READ_COMMITTED, work);
+    }
+
+    /**
+     * Executa un conjunt d'operacions sense valor de retorn dins d'una transacció.
+     *
+     * @param work treball a executar dins de la transacció
+     * @throws SQLException si hi ha un error SQL
+     */
+    public void transaction(SqlRunnable work) throws SQLException {
+        Objects.requireNonNull(work, "El treball transaccional no pot ser nul");
+
+        transaction(db -> {
+            work.execute(db);
+            return null;
+        });
+    }
+
+    /**
+     * Executa un conjunt d'operacions dins d'una transacció amb un nivell
+     * d'aïllament concret.
+     *
+     * @param isolationLevel nivell d'aïllament de {@link Connection}
+     * @param work treball a executar dins de la transacció
+     * @param <T> tipus de valor retornat
+     * @return valor retornat pel treball
+     * @throws SQLException si hi ha un error SQL
+     */
+    public <T> T transaction(int isolationLevel, SqlWork<T> work) throws SQLException {
+        Objects.requireNonNull(work, "El treball transaccional no pot ser nul");
+
+        try (Connection conn = pool.getDataSource().getConnection()) {
+            boolean previousAutoCommit = conn.getAutoCommit();
+            int previousIsolation = conn.getTransactionIsolation();
+
+            try {
+                conn.setAutoCommit(false);
+                conn.setTransactionIsolation(isolationLevel);
+
+                T result = work.execute(using(conn, false));
+
+                conn.commit();
+                return result;
+            } catch (Exception ex) {
+                conn.rollback();
+
+                if (ex instanceof SQLException sqlEx) {
+                    throw sqlEx;
+                }
+
+                throw new SQLException("Error executant la transacció", ex);
+            } finally {
+                conn.setTransactionIsolation(previousIsolation);
+                conn.setAutoCommit(previousAutoCommit);
+            }
+        }
+    }
+
+    /**
+     * Executa una transacció protegida amb bloquejos de taula.
+     *
+     * <p>
+     * La connexió espera com a màxim el temps indicat per obtenir els bloquejos.
+     * Si no és possible obtenir-los dins del termini, es llança una excepció de
+     * timeout i no s'executa el treball.
+     * </p>
+     *
+     * @param locks taules que s'han de bloquejar
+     * @param timeoutSeconds segons màxims d'espera per obtenir els bloquejos
+     * @param work treball a executar dins de la transacció protegida
+     * @param <T> tipus de valor retornat
+     * @return valor retornat pel treball
+     * @throws SQLException si hi ha un error SQL o un timeout de bloqueig
+     */
+    public <T> T transactionWithTableLocks(
+            List<TableLock> locks,
+            int timeoutSeconds,
+            SqlWork<T> work) throws SQLException {
+        return transactionWithTableLocks(Connection.TRANSACTION_READ_COMMITTED, locks, timeoutSeconds, work);
+    }
+
+    /**
+     * Executa una transacció protegida amb bloquejos de taula i un nivell
+     * d'aïllament concret.
+     *
+     * @param isolationLevel nivell d'aïllament de {@link Connection}
+     * @param locks taules que s'han de bloquejar
+     * @param timeoutSeconds segons màxims d'espera per obtenir els bloquejos
+     * @param work treball a executar dins de la transacció protegida
+     * @param <T> tipus de valor retornat
+     * @return valor retornat pel treball
+     * @throws SQLException si hi ha un error SQL o un timeout de bloqueig
+     */
+    public <T> T transactionWithTableLocks(
+            int isolationLevel,
+            List<TableLock> locks,
+            int timeoutSeconds,
+            SqlWork<T> work) throws SQLException {
+        Objects.requireNonNull(work, "El treball transaccional no pot ser nul");
+        validateTableLocks(locks, timeoutSeconds);
+
+        try (Connection conn = pool.getDataSource().getConnection()) {
+            boolean previousAutoCommit = conn.getAutoCommit();
+            int previousIsolation = conn.getTransactionIsolation();
+            int previousLockWaitTimeout = readSessionInt(conn, "lock_wait_timeout");
+            int previousInnodbLockWaitTimeout = readSessionInt(conn, "innodb_lock_wait_timeout");
+            boolean locked = false;
+
+            try {
+                conn.setAutoCommit(false);
+                conn.setTransactionIsolation(isolationLevel);
+                configureLockTimeouts(conn, timeoutSeconds);
+                lockTables(conn, locks, timeoutSeconds);
+                locked = true;
+
+                T result = work.execute(using(conn, false));
+
+                conn.commit();
+                return result;
+            } catch (Exception ex) {
+                rollbackQuietly(conn);
+
+                if (isLockTimeout(ex)) {
+                    throw new TableLockTimeoutException(
+                            "No s'ha pogut obtenir el bloqueig de taula dins del temps permès",
+                            ex);
+                }
+
+                if (ex instanceof SQLException sqlEx) {
+                    throw sqlEx;
+                }
+
+                throw new SQLException("Error executant la transacció protegida amb bloqueig de taula", ex);
+            } finally {
+                if (locked) {
+                    unlockTablesQuietly(conn);
+                }
+
+                restoreLockTimeoutsQuietly(conn, previousLockWaitTimeout, previousInnodbLockWaitTimeout);
+                conn.setTransactionIsolation(previousIsolation);
+                conn.setAutoCommit(previousAutoCommit);
+            }
+        }
+    }
+
+    private void validateTableLocks(List<TableLock> locks, int timeoutSeconds) {
+        Objects.requireNonNull(locks, "La llista de bloquejos no pot ser nul·la");
+
+        if (locks.isEmpty()) {
+            throw new IllegalArgumentException("Cal indicar com a mínim una taula per bloquejar");
+        }
+
+        if (timeoutSeconds <= 0) {
+            throw new IllegalArgumentException("El timeout de bloqueig ha de ser positiu");
+        }
+
+        for (TableLock lock : locks) {
+            Objects.requireNonNull(lock, "El bloqueig de taula no pot ser nul");
+        }
+    }
+
+    private void configureLockTimeouts(Connection conn, int timeoutSeconds) throws SQLException {
+        executeStatement(conn, "SET SESSION lock_wait_timeout = " + timeoutSeconds, timeoutSeconds);
+        executeStatement(conn, "SET SESSION innodb_lock_wait_timeout = " + timeoutSeconds, timeoutSeconds);
+    }
+
+    private void restoreLockTimeoutsQuietly(
+            Connection conn,
+            int lockWaitTimeout,
+            int innodbLockWaitTimeout) {
+        try {
+            executeStatement(conn, "SET SESSION lock_wait_timeout = " + lockWaitTimeout, 0);
+            executeStatement(conn, "SET SESSION innodb_lock_wait_timeout = " + innodbLockWaitTimeout, 0);
+        } catch (SQLException ignored) {
+            // No es pot fer res útil sense ocultar l'error original de la transacció.
+        }
+    }
+
+    private int readSessionInt(Connection conn, String variableName) throws SQLException {
+        try (Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT @@session." + variableName)) {
+            return rs.next() ? rs.getInt(1) : 0;
+        }
+    }
+
+    private void lockTables(Connection conn, List<TableLock> locks, int timeoutSeconds) throws SQLException {
+        StringBuilder sql = new StringBuilder("LOCK TABLES ");
+
+        for (int i = 0; i < locks.size(); i++) {
+            if (i > 0) {
+                sql.append(", ");
+            }
+
+            sql.append(locks.get(i).toSql());
+        }
+
+        executeStatement(conn, sql.toString(), timeoutSeconds);
+    }
+
+    private void unlockTablesQuietly(Connection conn) {
+        try {
+            executeStatement(conn, "UNLOCK TABLES", 0);
+        } catch (SQLException ignored) {
+            // El bloqueig s'allibera igualment quan es tanca la connexió.
+        }
+    }
+
+    private void executeStatement(Connection conn, String sql, int timeoutSeconds) throws SQLException {
+        try (Statement stmt = conn.createStatement()) {
+            if (timeoutSeconds > 0) {
+                stmt.setQueryTimeout(timeoutSeconds);
+            }
+
+            stmt.execute(sql);
+        }
+    }
+
+    private void rollbackQuietly(Connection conn) {
+        try {
+            conn.rollback();
+        } catch (SQLException ignored) {
+            // Es conserva l'error original.
+        }
+    }
+
+    private boolean isLockTimeout(Throwable error) {
+        Throwable current = error;
+
+        while (current != null) {
+            if (current instanceof SQLTimeoutException) {
+                return true;
+            }
+
+            if (current instanceof SQLException sqlEx && sqlEx.getErrorCode() == 1205) {
+                return true;
+            }
+
+            current = current.getCause();
+        }
+
+        return false;
     }
 
     private Context context() {
@@ -347,7 +623,7 @@ public class Database {
      * Context fluït per executar operacions utilitzant una connexió o un
      * {@link DataSource} concret.
      */
-    public class Context {
+    public class Context implements DbExecutor {
 
         private final DataSource src;
         private final Connection conn;
@@ -382,6 +658,7 @@ public class Database {
          * @return objecte trobat o {@code null}
          * @throws SQLException si hi ha un error SQL
          */
+        @Override
         public <T> T one(String sql, RowMapper<T> mapper) throws SQLException {
             return one(sql, Params.none(), mapper);
         }
@@ -421,6 +698,7 @@ public class Database {
          * @return objecte trobat o {@code null}
          * @throws SQLException si hi ha un error SQL
          */
+        @Override
         public <T> T one(String sql, Object param, RowMapper<T> mapper) throws SQLException {
             return one(sql, Params.of(param), mapper);
         }
@@ -436,6 +714,7 @@ public class Database {
          * @return objecte trobat o {@code null}
          * @throws SQLException si hi ha un error SQL
          */
+        @Override
         public <T> T one(String sql, Object[] params, RowMapper<T> mapper) throws SQLException {
             return one(sql, Params.of(params), mapper);
         }
@@ -449,6 +728,7 @@ public class Database {
          * @return llista d'objectes trobats
          * @throws SQLException si hi ha un error SQL
          */
+        @Override
         public <T> List<T> list(String sql, RowMapper<T> mapper) throws SQLException {
             return list(sql, Params.none(), mapper);
         }
@@ -494,6 +774,7 @@ public class Database {
          * @return llista d'objectes trobats
          * @throws SQLException si hi ha un error SQL
          */
+        @Override
         public <T> List<T> list(String sql, Object param, RowMapper<T> mapper) throws SQLException {
             return list(sql, Params.of(param), mapper);
         }
@@ -509,6 +790,7 @@ public class Database {
          * @return llista d'objectes trobats
          * @throws SQLException si hi ha un error SQL
          */
+        @Override
         public <T> List<T> list(String sql, Object[] params, RowMapper<T> mapper) throws SQLException {
             return list(sql, Params.of(params), mapper);
         }
@@ -546,6 +828,7 @@ public class Database {
          * @return nombre de files afectades
          * @throws SQLException si hi ha un error SQL
          */
+        @Override
         public int update(String sql, Object... params) throws SQLException {
             return update(sql, Params.of(params));
         }
@@ -586,6 +869,7 @@ public class Database {
          * @return clau generada o {@code -1}
          * @throws SQLException si hi ha un error SQL
          */
+        @Override
         public long insert(String sql, Object... params) throws SQLException {
             return insert(sql, Params.of(params));
         }
@@ -611,6 +895,7 @@ public class Database {
          * @return nombre de files eliminades
          * @throws SQLException si hi ha un error SQL
          */
+        @Override
         public int delete(String sql, Object... params) throws SQLException {
             return delete(sql, Params.of(params));
         }
@@ -637,6 +922,7 @@ public class Database {
          * @return {@code true} si la consulta retorna alguna fila
          * @throws SQLException si hi ha un error SQL
          */
+        @Override
         public boolean exists(String sql, Object... params) throws SQLException {
             return exists(sql, Params.of(params));
         }
@@ -668,6 +954,7 @@ public class Database {
          * @return valor numèric de la primera columna, o {@code 0} si no hi ha resultat
          * @throws SQLException si hi ha un error SQL
          */
+        @Override
         public long count(String sql, Object... params) throws SQLException {
             return count(sql, Params.of(params));
         }

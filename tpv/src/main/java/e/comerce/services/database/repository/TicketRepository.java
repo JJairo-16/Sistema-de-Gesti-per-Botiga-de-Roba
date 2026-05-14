@@ -6,16 +6,16 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
-import e.comerce.libs.db.Database;
+import e.comerce.libs.db.DbExecutor;
 import e.comerce.models.Ticket;
 
 /** Gestiona les capçaleres dels tiquets de venda. */
 public class TicketRepository {
     private static final DateTimeFormatter APP_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    private final Database db;
+    private final DbExecutor db;
 
-    public TicketRepository(Database db) {
+    public TicketRepository(DbExecutor db) {
         this.db = Objects.requireNonNull(db, "La base de dades no pot ser nul·la");
     }
 
